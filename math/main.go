@@ -1,5 +1,9 @@
 package main
 
+import (
+	"fmt"
+)
+
 func Pow(base, exp int) int         { return 0 }
 func PowMod(base, exp, mod int) int { return 0 }
 func IsPrime(n int) bool {
@@ -15,10 +19,54 @@ func IsPrime(n int) bool {
 	return true
 }
 
+func getPrimeFactors(n int) []int {
+	// time: O(sqrt(n)), space: O(1)
+
+	primes := []int{}
+	for i := 2; i*i <= n; i++ {
+		if n%i == 0 {
+			primes = append(primes, i)
+			for n%i == 0 {
+				n /= i
+			}
+		}
+	}
+	if n > 1 {
+		primes = append(primes, n)
+	}
+	return primes
+}
+
 // greatest common divisor
 func GCD(a, b int) int { return 0 }
 
 // least common multiple
 func LCM(a, b int) int     { return 0 }
-func DivCeil(a, b int) int { return 0 }
-func CountBits(x int) int  { return 0 }
+func DivCeil(a, b int) int { return (a + b - 1) / b }
+
+// bits
+func CountSetBits(x int) int    { return 0 }
+func CountBits(x int) int       { return 0 }
+func IsPowerOfTwo(x int) bool   { return false }
+func SetBit(x int, pos int) int { return x }
+func OffBit(x int, pos int) int { return x }
+
+func main() {
+	// t := time.Now()
+	// for i := range int(1e5) {
+	// 	PrimeFactorization(i)
+	// }
+	// fmt.Println(time.Since(t))
+
+	fmt.Println(getPrimeFactors(2 * 3 * 5 * 7 * 11 * 13))
+	fmt.Println(getPrimeFactors(2))
+	return
+
+	k := 0
+	for i := range int(1e6 + 1) {
+		if IsPrime(i) {
+			k++
+		}
+	}
+	fmt.Println(k)
+}
