@@ -44,6 +44,8 @@ func GCD(a, b int) int { return 0 }
 func LCM(a, b int) int     { return 0 }
 func DivCeil(a, b int) int { return (a + b - 1) / b }
 
+func Calculate(expression string) float64 { return 0 }
+
 // bits
 func CountSetBits(x int) int    { return 0 }
 func CountBits(x int) int       { return 0 }
