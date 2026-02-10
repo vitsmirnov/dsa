@@ -1,37 +1,39 @@
 package main
 
 func MergeSort(arr []int) {
+	// time: O(n log n), space: O(n)
+
 	buf := make([]int, len(arr))
 
-	var sort func(start, end int)
-	sort = func(start, end int) {
-		if end <= start {
-			return
+	var sort func(left, right int)
+	sort = func(left, right int) {
+		if left < right {
+			mid := left + (right-left)/2
+			sort(left, mid)
+			sort(mid+1, right)
+			merge(arr, buf, left, mid, right)
 		}
-
-		p := start + (end-start)/2
-		sort(start, p)
-		sort(p+1, end)
-		merge(arr, buf, start, p+1, end)
 	}
 
 	sort(0, len(arr)-1)
 }
 
-func merge(arr, buf []int, p1, p2, end int) {
-	resLen := end - p1 + 1
-	for i, _p1, _p2 := 0, p1, p2; i < resLen; i++ {
-		if _p2 > end || (_p1 < p2 && arr[_p1] < arr[_p2]) {
-			buf[i] = arr[_p1]
-			_p1++
+func merge(arr, buf []int, left, mid, right int) {
+	// time: O(n), space: O(1)
+
+	resLen := right - left + 1
+	for i, l, r := 0, left, mid+1; i < resLen; i++ {
+		if r > right || (l <= mid && arr[l] < arr[r]) {
+			buf[i] = arr[l]
+			l++
 		} else {
-			buf[i] = arr[_p2]
-			_p2++
+			buf[i] = arr[r]
+			r++
 		}
 	}
 	for i := range resLen {
-		arr[p1] = buf[i]
-		p1++
+		arr[left] = buf[i]
+		left++
 	}
 }
 
@@ -41,7 +43,6 @@ func MergeSort0(arr []int) []int {
 	if len(arr) <= 1 {
 		return arr
 	}
-
 	p := len(arr) / 2
 	return merge0(MergeSort0(arr[:p]), MergeSort0(arr[p:]))
 }

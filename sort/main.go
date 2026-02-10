@@ -1,14 +1,15 @@
 package main
 
 import (
+	"cmp"
 	"fmt"
 	"math/rand/v2"
 	"time"
 )
 
-func isSorted(arr []int) bool {
-	for i, l := 1, len(arr); i < l; i++ {
-		if arr[i] < arr[i-1] {
+func isSorted[T cmp.Ordered](arr []T) bool {
+	for i := range len(arr) - 1 {
+		if arr[i] > arr[i+1] {
 			return false
 		}
 	}
@@ -22,23 +23,26 @@ func testSort(sort func([]int), sortName string, arrLen int, maxNum int, loopCou
 		for i := range arr {
 			arr[i] = rand.IntN(maxNum*2+1) - maxNum
 		}
-		if isSorted(arr) {
-			fmt.Println("random array is sorted!")
-		}
+		// if isSorted(arr) {
+		// 	fmt.Println("random array is sorted!")
+		// }
 		sort(arr)
 		if !isSorted(arr) {
-			fmt.Println("sort does not work!")
+			fmt.Printf("%q sort does not work!\n", sortName)
 		}
 	}
 	// funcName := runtime.FuncForPC(uintptr(runtime.FuncForPC))
-	fmt.Printf("time (%v): %v\n", sortName, time.Since(t))
+	// fmt.Printf("time (%v): %v\n", sortName, time.Since(t))
+	fmt.Printf("time (%v): %v (len: %v, range: [%v : %v], loops: %v)\n",
+		sortName, time.Since(t), arrLen, -maxNum, maxNum, loopCount)
 }
 
 func testSortDefault(sort func([]int), sortName string) {
 	const arrLen int = 100_000
 	const maxNum int = 1_000_000
+	const loopCount = 100
 
-	testSort(sort, sortName, arrLen, maxNum, 100)
+	testSort(sort, sortName, arrLen, maxNum, loopCount)
 }
 
 func main() {
@@ -54,4 +58,5 @@ func main() {
 	testSortDefault(HeapSort, "heap")
 	testSortDefault(MergeSort, "merge")
 	testSortDefault(QuickSort, "quick")
+	testSortDefault(CountingSort, "counting")
 }

@@ -6,16 +6,18 @@ import (
 )
 
 func QuickSort[T cmp.Ordered](arr []T) {
-	if len(arr) <= 1 {
-		return
-	}
+	// time: O(n log n), space: O(log n)
 
-	i := partition(arr)
-	QuickSort(arr[:i])
-	QuickSort(arr[i+1:])
+	if !isSorted(arr) { // len(arr) > 1
+		i := partition(arr)
+		QuickSort(arr[:i])
+		QuickSort(arr[i+1:])
+	}
 }
 
 func partition[T cmp.Ordered](arr []T) int {
+	// time: O(n), space: O(1)
+
 	arrLen := len(arr)
 	pivotIndex := rand.IntN(arrLen)
 	pivot := arr[pivotIndex]

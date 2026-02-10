@@ -1,17 +1,21 @@
 package main
 
 func HeapSort(arr []int) {
+	// time: O(n log n), space: O(1)
+
 	arrLen := len(arr)
-	for i := (arrLen - 2) / 2; i >= 0; i-- {
-		Sink(arr, arrLen, i)
+	for i := arrLen/2 - 1; i >= 0; i-- { // (arrLen - 2) / 2 ?
+		sink(arr, arrLen, i)
 	}
 	for i := arrLen - 1; i >= 0; i-- {
 		arr[0], arr[i] = arr[i], arr[0]
-		Sink(arr, i, 0)
+		sink(arr, i, 0)
 	}
 }
 
-func Sink(arr []int, length int, index int) {
+func sink(arr []int, length int, index int) {
+	// time: O(log n), space: O(1)
+
 	cur := index
 	child := cur*2 + 1 // left
 	for done := false; !done && child < length; {
@@ -27,7 +31,37 @@ func Sink(arr []int, length int, index int) {
 	}
 }
 
-func Sink0(arr []int, length int, index int) {
+// todo: cleanup
+
+func down(nums []int, numsLen, index int) {
+	// time: O(log n), space: O(1)
+
+	child := index*2 + 1 // left
+	for child < numsLen {
+		if child+1 < numsLen && nums[child+1] > nums[child] {
+			child++
+		}
+		if nums[child] <= nums[index] {
+			return
+		}
+		nums[index], nums[child] = nums[child], nums[index]
+		index = child
+		child = index*2 + 1 // left
+	}
+}
+
+func up(nums []int, index int) {
+	// time: O(log n), space: O(1)
+	// ?
+
+	for parent := (index - 1) / 2; nums[parent] > nums[index]; {
+		nums[parent], nums[index] = nums[index], nums[parent]
+		index = parent
+		parent = (index - 1) / 2
+	}
+}
+
+func sink0(arr []int, length int, index int) {
 	maxChild := func(p int) int {
 		left := p*2 + 1
 		right := left + 1
