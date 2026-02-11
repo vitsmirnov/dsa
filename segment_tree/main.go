@@ -8,55 +8,63 @@ import (
 type SegmentTree struct{ sums []int }
 
 func MakeSegmentTree(arr []int) *SegmentTree {
-	sums := make([]int, len(arr)*4)
-	buildST(arr, sums, 0, 0, len(arr)-1)
-	return &SegmentTree{sums: sums}
+	st := &SegmentTree{sums: make([]int, len(arr)*4)}
+	st.build(arr, 0, 0, len(arr)-1)
+	return st
 }
 
-func buildST(arr, sums []int, pos int, segLeft, segRight int) {
+func (st *SegmentTree) build(arr []int, pos int, segLeft, segRight int) {
 	if segLeft == segRight {
-		sums[pos] = arr[segLeft]
+		st.sums[pos] = arr[segLeft]
 	} else {
 		mid := segLeft + (segRight-segLeft)/2
 		leftChild, rightChild := pos*2+1, pos*2+2
-		buildST(arr, sums, leftChild, segLeft, mid)
-		buildST(arr, sums, rightChild, mid+1, segRight)
-		sums[pos] = sums[leftChild] + sums[rightChild]
-	}
-}
-
-func sumST(sums []int, pos int, segLeft, segRight, qLeft, qRight int) int {
-	if qLeft > qRight {
-		return 0
-	}
-	if segLeft == qLeft && segRight == qRight {
-		return sums[pos]
-	}
-	mid := segLeft + (segRight-segLeft)/2
-	return sumST(sums, pos*2+1, segLeft, mid, qLeft, min(qRight, mid)) +
-		sumST(sums, pos*2+2, mid+1, segRight, max(qLeft, mid+1), qRight)
-}
-
-func updateST(sums []int, pos int, segLeft, segRight int, index int, value int) {
-	if segLeft == segRight {
-		sums[pos] = value
-	} else {
-		mid := segLeft + (segRight-segLeft)/2
-		if index <= mid {
-			updateST(sums, pos*2+1, segLeft, mid, index, value)
-		} else {
-			updateST(sums, pos*2+2, mid+1, segRight, index, value)
-		}
-		sums[pos] = sums[pos*2+1] + sums[pos*2+2]
+		st.build(arr, leftChild, segLeft, mid)
+		st.build(arr, rightChild, mid+1, segRight)
+		st.sums[pos] = st.sums[leftChild] + st.sums[rightChild]
 	}
 }
 
 func (st *SegmentTree) Sum(left, right int) int {
-	return sumST(st.sums, 0, 0, len(st.sums)/4-1, left, right)
+	return st.sum(0, 0, len(st.sums)/4-1, left, right)
+}
+
+func (st *SegmentTree) sum(pos int, segLeft, segRight, qLeft, qRight int) int {
+	if qLeft > qRight {
+		return 0
+	}
+	if segLeft == qLeft && segRight == qRight {
+		return st.sums[pos]
+	}
+	mid := segLeft + (segRight-segLeft)/2
+	return st.sum(pos*2+1, segLeft, mid, qLeft, min(qRight, mid)) +
+		st.sum(pos*2+2, mid+1, segRight, max(qLeft, mid+1), qRight)
 }
 
 func (st *SegmentTree) Update(index int, value int) {
-	updateST(st.sums, 0, 0, len(st.sums)/4-1, index, value)
+	st.update(0, 0, len(st.sums)/4-1, index, value)
+}
+
+func (st *SegmentTree) update(pos int, segLeft, segRight int, index int, value int) {
+	if segLeft == segRight {
+		st.sums[pos] = value
+	} else {
+		mid := segLeft + (segRight-segLeft)/2
+		if index <= mid {
+			st.update(pos*2+1, segLeft, mid, index, value)
+		} else {
+			st.update(pos*2+2, mid+1, segRight, index, value)
+		}
+		st.sums[pos] = st.sums[pos*2+1] + st.sums[pos*2+2]
+	}
+}
+
+func (st *SegmentTree) Nums() []int {
+	res := make([]int, len(st.sums)/4)
+	for i := range res {
+		res[i] = st.Sum(i, i)
+	}
+	return res
 }
 
 // temp
@@ -148,4 +156,10 @@ func testSegmentTree() {
 
 func main() {
 	testSegmentTree()
+
+	// nums := GenerateNums(6, 1, 9)
+	// st := MakeSegmentTree(nums)
+	// fmt.Println(nums)
+	// fmt.Println(st.Nums())
+	// fmt.Println(st.sums)
 }
