@@ -1,14 +1,14 @@
 package main
 
-type SegmentTree struct{ sums []int }
+type SumSegmentTree struct{ sums []int }
 
-func MakeSegmentTree(arr []int) *SegmentTree {
-	st := &SegmentTree{sums: make([]int, len(arr)*4)}
+func MakeSumSegmentTree(arr []int) *SumSegmentTree {
+	st := &SumSegmentTree{sums: make([]int, len(arr)*4)}
 	st.build(arr, 0, 0, len(arr)-1)
 	return st
 }
 
-func (st *SegmentTree) build(arr []int, pos int, segLeft, segRight int) {
+func (st *SumSegmentTree) build(arr []int, pos int, segLeft, segRight int) {
 	if segLeft == segRight {
 		st.sums[pos] = arr[segLeft]
 	} else {
@@ -20,11 +20,11 @@ func (st *SegmentTree) build(arr []int, pos int, segLeft, segRight int) {
 	}
 }
 
-func (st *SegmentTree) Sum(left, right int) int {
+func (st *SumSegmentTree) Sum(left, right int) int {
 	return st.sum(0, 0, len(st.sums)/4-1, left, right)
 }
 
-func (st *SegmentTree) sum(pos int, segLeft, segRight, qLeft, qRight int) int {
+func (st *SumSegmentTree) sum(pos int, segLeft, segRight, qLeft, qRight int) int {
 	if qLeft > qRight {
 		return 0
 	}
@@ -36,11 +36,11 @@ func (st *SegmentTree) sum(pos int, segLeft, segRight, qLeft, qRight int) int {
 		st.sum(pos*2+2, mid+1, segRight, max(qLeft, mid+1), qRight)
 }
 
-func (st *SegmentTree) Update(index int, value int) {
+func (st *SumSegmentTree) Update(index int, value int) {
 	st.update(0, 0, len(st.sums)/4-1, index, value)
 }
 
-func (st *SegmentTree) update(pos int, segLeft, segRight int, index int, value int) {
+func (st *SumSegmentTree) update(pos int, segLeft, segRight int, index int, value int) {
 	if segLeft == segRight {
 		st.sums[pos] = value
 	} else {
@@ -54,7 +54,7 @@ func (st *SegmentTree) update(pos int, segLeft, segRight int, index int, value i
 	}
 }
 
-func (st *SegmentTree) Nums() []int {
+func (st *SumSegmentTree) Nums() []int {
 	res := make([]int, len(st.sums)/4)
 	for i := range res {
 		res[i] = st.Sum(i, i)
