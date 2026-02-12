@@ -11,13 +11,13 @@ func MakeSumSegmentTree(arr []int) *SumSegmentTree {
 func (st *SumSegmentTree) build(arr []int, pos int, segLeft, segRight int) {
 	if segLeft == segRight {
 		st.sums[pos] = arr[segLeft]
-	} else {
-		mid := segLeft + (segRight-segLeft)/2
-		leftChild, rightChild := pos*2+1, pos*2+2
-		st.build(arr, leftChild, segLeft, mid)
-		st.build(arr, rightChild, mid+1, segRight)
-		st.sums[pos] = st.sums[leftChild] + st.sums[rightChild]
+		return
 	}
+	mid := segLeft + (segRight-segLeft)/2
+	leftChild, rightChild := pos*2+1, pos*2+2
+	st.build(arr, leftChild, segLeft, mid)
+	st.build(arr, rightChild, mid+1, segRight)
+	st.sums[pos] = st.sums[leftChild] + st.sums[rightChild]
 }
 
 func (st *SumSegmentTree) Sum(left, right int) int {
@@ -53,6 +53,8 @@ func (st *SumSegmentTree) update(pos int, segLeft, segRight int, index int, valu
 		st.sums[pos] = st.sums[pos*2+1] + st.sums[pos*2+2]
 	}
 }
+
+func (st *SumSegmentTree) NumsLen() int { return len(st.sums) / 4 }
 
 func (st *SumSegmentTree) Nums() []int {
 	res := make([]int, len(st.sums)/4)

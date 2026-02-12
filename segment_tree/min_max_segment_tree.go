@@ -16,14 +16,14 @@ func (st *MinMaxSegmentTree) build(arr []int, pos int, segLeft, segRight int) {
 	if segLeft == segRight {
 		st.items[pos].min = arr[segLeft]
 		st.items[pos].max = arr[segLeft]
-	} else {
-		mid := segLeft + (segRight-segLeft)/2
-		leftChild, rightChild := pos*2+1, pos*2+2
-		st.build(arr, leftChild, segLeft, mid)
-		st.build(arr, rightChild, mid+1, segRight)
-		st.items[pos].min = min(st.items[leftChild].min, st.items[rightChild].min)
-		st.items[pos].max = max(st.items[leftChild].max, st.items[rightChild].max)
+		return
 	}
+	mid := segLeft + (segRight-segLeft)/2
+	leftChild, rightChild := pos*2+1, pos*2+2
+	st.build(arr, leftChild, segLeft, mid)
+	st.build(arr, rightChild, mid+1, segRight)
+	st.items[pos].min = min(st.items[leftChild].min, st.items[rightChild].min)
+	st.items[pos].max = max(st.items[leftChild].max, st.items[rightChild].max)
 }
 
 func (st *MinMaxSegmentTree) Min(left, right int) int {
@@ -91,6 +91,8 @@ func (st *MinMaxSegmentTree) update(pos int, segLeft, segRight int, index int, v
 		st.items[pos].max = max(st.items[leftChild].max, st.items[rightChild].max)
 	}
 }
+
+func (st *MinMaxSegmentTree) NumsLen() int { return len(st.items) / 4 }
 
 func (st *MinMaxSegmentTree) Nums() []int {
 	res := make([]int, len(st.items)/4)
