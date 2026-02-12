@@ -38,11 +38,37 @@ func getPrimeFactors(n int) []int {
 }
 
 // greatest common divisor
-func GCD(a, b int) int { return 0 }
+func GCD(a, b int) int {
+	for b != 0 {
+		a, b = b, a%b
+	}
+	return a
+}
+
+func GCD2(a, b int) int {
+	if b == 0 {
+		return a
+	}
+	return GCD2(b, a%b)
+}
 
 // least common multiple
-func LCM(a, b int) int     { return 0 }
+func LCM(a, b int) int     { return Abs(a*b) / GCD(a, b) }
 func DivCeil(a, b int) int { return (a + b - 1) / b }
+
+type Integer interface {
+	int | int8 | int16 | int32 | int64 |
+		uint | uint8 | uint16 | uint32 | uint64
+}
+
+type Number interface{ Integer | float32 | float64 }
+
+func Abs[T Number](x T) T {
+	if x < 0 {
+		return -x
+	}
+	return x
+}
 
 func Calculate(expression string) float64 { return 0 }
 
@@ -64,11 +90,11 @@ func main() {
 	fmt.Println(getPrimeFactors(2))
 	return
 
-	k := 0
-	for i := range int(1e6 + 1) {
-		if IsPrime(i) {
-			k++
-		}
-	}
-	fmt.Println(k)
+	// k := 0
+	// for i := range int(1e6 + 1) {
+	// 	if IsPrime(i) {
+	// 		k++
+	// 	}
+	// }
+	// fmt.Println(k)
 }
