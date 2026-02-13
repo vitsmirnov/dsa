@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 )
 
 func Pow(base, exp int) int         { return 0 }
@@ -19,7 +20,7 @@ func IsPrime(n int) bool {
 	return true
 }
 
-func getPrimeFactors(n int) []int {
+func GetPrimeFactors(n int) []int {
 	// time: O(sqrt(n)), space: O(1)
 
 	primes := []int{}
@@ -35,6 +36,24 @@ func getPrimeFactors(n int) []int {
 		primes = append(primes, n)
 	}
 	return primes
+}
+
+// sieve of Eratosthenes
+func Sieve(n int) []bool {
+	// time: O(n log log n), space: O(n)
+
+	primeTags := make([]bool, n+1)
+	for i := 2; i <= n; i++ {
+		primeTags[i] = true
+	}
+	for i := 2; i*i <= n; i++ {
+		if primeTags[i] {
+			for j := i * i; j <= n; j += i {
+				primeTags[j] = false
+			}
+		}
+	}
+	return primeTags
 }
 
 // greatest common divisor
@@ -79,15 +98,58 @@ func IsPowerOfTwo(x int) bool   { return false }
 func SetBit(x int, pos int) int { return x }
 func OffBit(x int, pos int) int { return x }
 
+func testSieve() {
+	const maxNum int = 1e5
+	const loopCount = 1000
+
+	countPrimes := func(n int) int {
+		count := 0
+		for i := range n + 1 {
+			if IsPrime(i) {
+				count++
+			}
+		}
+		return count
+	}
+	countPrimesWithSieve := func(n int) int {
+		count := 0
+		for _, isPrime := range Sieve(n) {
+			if isPrime {
+				count++
+			}
+		}
+		return count
+	}
+
+	t := time.Now()
+	var d1, d2 time.Duration
+	for range 1 { //loopCount {
+		n := int(1e7) //rand.IntN(maxNum)
+		_t := time.Now()
+		count1 := countPrimes(n)
+		d1 += time.Since(_t)
+		_t = time.Now()
+		count2 := countPrimesWithSieve(n)
+		d2 += time.Since(_t)
+		if count1 != count2 {
+			fmt.Printf("Count primes failed for %v: %v != %v (sieve)\n", n, count1, count2)
+		}
+	}
+	fmt.Printf("Count primes test time: %v (%v, %v (sieve))\n", time.Since(t), d1, d2)
+}
+
 func main() {
+	testSieve()
+	return
+
 	// t := time.Now()
 	// for i := range int(1e5) {
 	// 	PrimeFactorization(i)
 	// }
 	// fmt.Println(time.Since(t))
 
-	fmt.Println(getPrimeFactors(2 * 3 * 5 * 7 * 11 * 13))
-	fmt.Println(getPrimeFactors(2))
+	fmt.Println(GetPrimeFactors(2 * 3 * 5 * 7 * 11 * 13))
+	fmt.Println(GetPrimeFactors(2))
 	return
 
 	// k := 0
