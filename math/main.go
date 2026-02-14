@@ -119,7 +119,68 @@ func Combinations(n int, k int) [][]int {
 	return combinations
 }
 
-func Permutations() {}
+func Permutations(n int) [][]int {
+	// time: O(n!*n), space: O(n) ?
+
+	permutations := make([][]int, 0, Factorial(n))
+	permutation := make([]int, n)
+	for i := range permutation {
+		permutation[i] = i
+	}
+
+	var permute func(pos int)
+	permute = func(pos int) {
+		if pos == n {
+			permutations = append(permutations, slices.Clone(permutation))
+			return
+		}
+
+		for i := pos; i < n; i++ {
+			permutation[i], permutation[pos] = permutation[pos], permutation[i]
+			permute(pos + 1)
+			permutation[i], permutation[pos] = permutation[pos], permutation[i]
+		}
+	}
+
+	permute(0)
+	return permutations
+}
+
+func Permutations0(n int) [][]int {
+	// time: O(n!*n), space: O(n) ?
+
+	permutations := make([][]int, 0, Factorial(n))
+	permutation := make([]int, n)
+	usedIndices := make([]bool, n)
+
+	var _permute func(pos int)
+	_permute = func(pos int) {
+		if pos == n {
+			permutations = append(permutations, slices.Clone(permutation))
+			return
+		}
+
+		for index, used := range usedIndices {
+			if !used {
+				permutation[pos] = index
+				usedIndices[index] = true
+				_permute(pos + 1)
+				usedIndices[index] = false
+			}
+		}
+	}
+
+	_permute(0)
+	return permutations
+}
+
+func Factorial(n int) int {
+	res := 1
+	for i := 2; i <= n; i++ {
+		res *= i
+	}
+	return res
+}
 
 // bits
 func CountSetBits(x int) int    { return 0 }
@@ -185,6 +246,23 @@ func testCombinations() {
 }
 
 func main() {
+	n := 3
+	for _, perm := range Permutations(n) {
+		fmt.Println(perm)
+	}
+	fmt.Println()
+	for _, perm := range Permutations0(n) {
+		fmt.Println(perm)
+	}
+	// fmt.Println(len(Permutations(n)))
+	// fmt.Println(len(Permutations0(n)))
+	return
+
+	// for i := range 10 {
+	// 	fmt.Printf("%v: %v\n", i, Factorial(i))
+	// }
+	// return
+
 	testCombinations()
 	return
 
