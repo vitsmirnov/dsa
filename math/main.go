@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"slices"
 	"time"
 )
 
@@ -91,6 +92,35 @@ func Abs[T Number](x T) T {
 
 func Calculate(expression string) float64 { return 0 }
 
+func Combinations(n int, k int) [][]int {
+	// time: O(C(n,k)*k), space: O(n) / O(C(n,k)*k) ?
+
+	if k > n {
+		return nil
+	}
+
+	combinations := [][]int{}
+	combination := make([]int, k)
+
+	var combine func(pos int, start int)
+	combine = func(pos int, start int) {
+		if pos == k {
+			combinations = append(combinations, slices.Clone(combination))
+			return
+		}
+
+		for num := start; num < n; num++ {
+			combination[pos] = num
+			combine(pos+1, num+1)
+		}
+	}
+
+	combine(0, 0)
+	return combinations
+}
+
+func Permutations() {}
+
 // bits
 func CountSetBits(x int) int    { return 0 }
 func CountBits(x int) int       { return 0 }
@@ -138,7 +168,26 @@ func testSieve() {
 	fmt.Printf("Count primes test time: %v (%v, %v (sieve))\n", time.Since(t), d1, d2)
 }
 
+func testCombinations() {
+	strs := []string{"a", "b", "c"}
+	for _, indices := range Combinations(len(strs), 2) {
+		for _, index := range indices {
+			fmt.Printf("%v ", strs[index])
+		}
+		fmt.Println()
+	}
+
+	return
+	combinations := Combinations(10, 3)
+	for _, combination := range combinations {
+		fmt.Println(combination)
+	}
+}
+
 func main() {
+	testCombinations()
+	return
+
 	testSieve()
 	return
 
