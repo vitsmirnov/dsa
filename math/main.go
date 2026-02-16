@@ -183,9 +183,19 @@ func Factorial(n int) int {
 }
 
 // bits
-func CountSetBits(x int) int    { return 0 }
+func CountSetBits(x int) int {
+	// Hamming weight (pop count)
+	// time: O(log n), space: O(1)
+
+	count := 0
+	for x != 0 {
+		count++
+		x &= x - 1
+	}
+	return count
+}
 func CountBits(x int) int       { return 0 }
-func IsPowerOfTwo(x int) bool   { return false }
+func IsPowerOfTwo(x int) bool   { return x > 0 && x&(x-1) == 0 }
 func SetBit(x int, pos int) int { return x }
 func OffBit(x int, pos int) int { return x }
 
