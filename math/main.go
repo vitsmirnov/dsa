@@ -194,7 +194,16 @@ func CountSetBits(x int) int {
 	}
 	return count
 }
-func CountBits(x int) int       { return 0 }
+func CountBits(x int) int {
+	// time: O(log n), space: O(1)
+
+	count := 0
+	for x != 0 {
+		count++
+		x >>= 1
+	}
+	return count
+}
 func IsPowerOfTwo(x int) bool   { return x > 0 && x&(x-1) == 0 }
 func SetBit(x int, pos int) int { return x }
 func OffBit(x int, pos int) int { return x }
@@ -256,6 +265,12 @@ func testCombinations() {
 }
 
 func main() {
+	// x := 3710
+	// fmt.Printf("%b\n", x)
+	// fmt.Println(CountBits(x))
+	// fmt.Println(CountSetBits(x))
+	// return
+
 	n := 3
 	for _, perm := range Permutations(n) {
 		fmt.Println(perm)
