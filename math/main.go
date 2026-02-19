@@ -6,6 +6,13 @@ import (
 	"time"
 )
 
+type Integer interface {
+	int | int8 | int16 | int32 | int64 |
+		uint | uint8 | uint16 | uint32 | uint64
+}
+
+type Number interface{ Integer | float32 | float64 }
+
 func Pow(base, exp int) int         { return 0 }
 func PowMod(base, exp, mod int) int { return 0 }
 func IsPrime(n int) bool {
@@ -75,13 +82,6 @@ func GCD2(a, b int) int {
 // least common multiple
 func LCM(a, b int) int     { return Abs(a*b) / GCD(a, b) }
 func DivCeil(a, b int) int { return (a + b - 1) / b }
-
-type Integer interface {
-	int | int8 | int16 | int32 | int64 |
-		uint | uint8 | uint16 | uint32 | uint64
-}
-
-type Number interface{ Integer | float32 | float64 }
 
 func Abs[T Number](x T) T {
 	if x < 0 {
@@ -153,8 +153,8 @@ func Permutations0(n int) [][]int {
 	permutation := make([]int, n)
 	usedIndices := make([]bool, n)
 
-	var _permute func(pos int)
-	_permute = func(pos int) {
+	var permute func(pos int)
+	permute = func(pos int) {
 		if pos == n {
 			permutations = append(permutations, slices.Clone(permutation))
 			return
@@ -164,13 +164,13 @@ func Permutations0(n int) [][]int {
 			if !used {
 				permutation[pos] = index
 				usedIndices[index] = true
-				_permute(pos + 1)
+				permute(pos + 1)
 				usedIndices[index] = false
 			}
 		}
 	}
 
-	_permute(0)
+	permute(0)
 	return permutations
 }
 
@@ -182,31 +182,7 @@ func Factorial(n int) int {
 	return res
 }
 
-// bits
-func CountSetBits(x int) int {
-	// Hamming weight (pop count)
-	// time: O(log n), space: O(1)
-
-	count := 0
-	for x != 0 {
-		count++
-		x &= x - 1
-	}
-	return count
-}
-func CountBits(x int) int {
-	// time: O(log n), space: O(1)
-
-	count := 0
-	for x != 0 {
-		count++
-		x >>= 1
-	}
-	return count
-}
-func IsPowerOfTwo(x int) bool   { return x > 0 && x&(x-1) == 0 }
-func SetBit(x int, pos int) int { return x }
-func OffBit(x int, pos int) int { return x }
+func IsPowerOfTwo(x int) bool { return x > 0 && x&(x-1) == 0 }
 
 func testSieve() {
 	const maxNum int = 1e5
