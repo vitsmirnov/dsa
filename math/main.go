@@ -174,6 +174,31 @@ func Permutations0(n int) [][]int {
 	return permutations
 }
 
+func NextPermutation(nums []int) {
+	// time: O(n), space: O(1)
+
+	numsLen := len(nums)
+	i := numsLen - 2
+	for i >= 0 && nums[i] >= nums[i+1] {
+		i--
+	}
+	if i >= 0 {
+		left, right := i+1, numsLen-1
+		for left <= right {
+			mid := left + (right-left)/2
+			if nums[mid] > nums[i] {
+				left = mid + 1
+			} else {
+				right = mid - 1
+			}
+		}
+		nums[i], nums[right] = nums[right], nums[i]
+	}
+	for left, right := i+1, numsLen-1; left < right; left, right = left+1, right-1 {
+		nums[left], nums[right] = nums[right], nums[left]
+	}
+}
+
 func Factorial(n int) int {
 	res := 1
 	for i := 2; i <= n; i++ {
