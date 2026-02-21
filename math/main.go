@@ -119,6 +119,66 @@ func Combinations(n int, k int) [][]int {
 	return combinations
 }
 
+func UniquePermutations(nums []int) [][]int {
+	// k-permutations of N (partial permutation)
+
+	numsLen := len(nums)
+	permutations := [][]int{}
+
+	var permute func(index int)
+	permute = func(index int) {
+		if index == numsLen {
+			permutations = append(permutations, slices.Clone(nums))
+			return
+		}
+
+		seen := map[int]bool{}
+		for i := index; i < numsLen; i++ {
+			if !seen[nums[i]] {
+				nums[index], nums[i] = nums[i], nums[index]
+				permute(index + 1)
+				nums[index], nums[i] = nums[i], nums[index]
+				seen[nums[i]] = true
+			}
+		}
+	}
+
+	permute(0)
+	return permutations
+}
+
+func UniquePermutations0(nums []int) [][]int {
+	// k-permutations of N (partial permutation)
+
+	numsLen := len(nums)
+	permutations := [][]int{}
+	permutation := make([]int, numsLen)
+	numsLeft := map[int]int{}
+	for _, num := range nums {
+		numsLeft[num]++
+	}
+
+	var permute func(index int)
+	permute = func(index int) {
+		if index == numsLen {
+			permutations = append(permutations, slices.Clone(permutation))
+			return
+		}
+
+		for num, left := range numsLeft {
+			if left > 0 {
+				permutation[index] = num
+				numsLeft[num]--
+				permute(index + 1)
+				numsLeft[num]++
+			}
+		}
+	}
+
+	permute(0)
+	return permutations
+}
+
 func Permutations(n int) [][]int {
 	// time: O(n!*n), space: O(n) ?
 
