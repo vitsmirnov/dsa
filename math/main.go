@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"slices"
 	"time"
 )
@@ -13,8 +14,68 @@ type Integer interface {
 
 type Number interface{ Integer | float32 | float64 }
 
-func Pow(base, exp int) int         { return 0 }
-func PowMod(base, exp, mod int) int { return 0 }
+func Pow(base, exp int) int {
+	// time: O(log exp), space: O(log exp)
+
+	return PowMod(base, exp, math.MaxInt)
+
+	// if exp == 0 {
+	// 	return 1
+	// } else if base == 0 || base == 1 {
+	// 	return base
+	// }
+
+	// res := Pow(base*base, exp>>1)
+	// if exp&1 == 1 {
+	// 	res *= base
+	// }
+	// return res
+}
+
+func Pow2(base, exp int) int {
+	// time: O(log exp), space: O(1)
+
+	res := 1
+	for exp != 0 {
+		if exp&1 == 1 {
+			res *= base
+		}
+		base *= base
+		exp >>= 1
+	}
+	return res
+}
+
+func PowMod(base, exp, mod int) int {
+	// time: O(log exp), space: O(log exp)
+
+	if exp == 0 {
+		return 1 % mod
+	} else if base == 0 || base == 1 {
+		return base % mod
+	}
+
+	res := PowMod((base*base)%mod, exp>>1, mod)
+	if exp&1 == 1 {
+		res = (res * base) % mod
+	}
+	return res
+}
+
+func PowMod2(base, exp, mod int) int {
+	// time: O(log exp), space: O(1)
+
+	res := 1
+	for exp != 0 {
+		if exp&1 == 1 {
+			res = (res * base) % mod
+		}
+		base = (base * base) % mod
+		exp >>= 1
+	}
+	return res % mod
+}
+
 func IsPrime(n int) bool {
 	if n <= 2 || n%2 == 0 {
 		return n == 2
@@ -325,7 +386,43 @@ func testCombinations() {
 	}
 }
 
+func testPow() {
+	pow := func(base, exp int) int {
+		// if exp == 0 {
+		// 	return 1
+		// }
+		res := 1
+		for range exp {
+			res *= base
+		}
+		return res
+	}
+
+	t := time.Now()
+	for base := range 13 {
+		for exp := range 17 {
+			// res1 := Pow(base, exp)
+			res1 := PowMod(base, exp, math.MaxInt)
+			// res2 := int(math.Pow(float64(base), float64(exp)))
+			res2 := pow(base, exp)
+			if res1 != res2 {
+				fmt.Printf("testPow unexpexted result: %v^%v = %v insted of %v\n", base, exp, res1, res2)
+			}
+
+			res1 = Pow(base, exp)
+			res2 = Pow2(base, exp)
+			if res1 != res2 {
+				fmt.Printf("testPow unexpexted result 2: %v^%v = %v insted of %v\n", base, exp, res1, res2)
+			}
+		}
+	}
+	fmt.Printf("testPow() time: %v\n", time.Since(t))
+}
+
 func main() {
+	testPow()
+	return
+
 	// x := 3710
 	// fmt.Printf("%b\n", x)
 	// fmt.Println(CountBits(x))
@@ -373,3 +470,8 @@ func main() {
 	// }
 	// fmt.Println(k)
 }
+
+// 2^6 = 2^(2*3) = (2^2)^3
+// 4^3 = (4^2)
+// 2^3 = 2^1 * 2^1 * 2^1
+// 2^3 = 2^2 * 2^1
