@@ -125,6 +125,29 @@ func Sieve(n int) []bool {
 	return primeTags
 }
 
+func Sieve2(n int) []bool {
+	// time: O(n log log n), space: O(n)
+	// ?
+
+	if n < 2 {
+		return make([]bool, n)
+	}
+
+	primeTags := make([]bool, n+1)
+	primeTags[2] = true
+	for i := 3; i <= n; i += 2 {
+		primeTags[i] = true
+	}
+	for i := 3; i*i <= n; i += 2 {
+		if primeTags[i] {
+			for j := i * i; j <= n; j += i {
+				primeTags[j] = false
+			}
+		}
+	}
+	return primeTags
+}
+
 // greatest common divisor
 func GCD(a, b int) int {
 	for b != 0 {
@@ -345,7 +368,12 @@ func testSieve() {
 	}
 	countPrimesWithSieve := func(n int) int {
 		count := 0
-		for _, isPrime := range Sieve(n) {
+		s1 := Sieve(n)
+		s2 := Sieve2(n)
+		if !slices.Equal(s1, s2) {
+			fmt.Printf("Sieve & Sieve2 yield different results for n = %v\n", n)
+		}
+		for _, isPrime := range s2 {
 			if isPrime {
 				count++
 			}
@@ -420,6 +448,9 @@ func testPow() {
 }
 
 func main() {
+	testSieve()
+	return
+
 	testPow()
 	return
 
@@ -447,9 +478,6 @@ func main() {
 	// return
 
 	testCombinations()
-	return
-
-	testSieve()
 	return
 
 	// t := time.Now()
