@@ -76,6 +76,27 @@ func PowMod2(base, exp, mod int) int {
 	return res % mod
 }
 
+func Sqrt(n int) int {
+	// time: O(log n), space: O(1)
+
+	if n <= 1 { // ~
+		return n
+	}
+
+	left, right := 0, n // 46_341 // sqrt(2^31-1)
+	for left <= right {
+		mid := left + (right-left)/2
+		if sqr := mid * mid; sqr > n {
+			right = mid - 1
+		} else if sqr < n {
+			left = mid + 1
+		} else {
+			return mid
+		}
+	}
+	return right
+}
+
 func IsPrime(n int) bool {
 	if n <= 2 || n%2 == 0 {
 		return n == 2
