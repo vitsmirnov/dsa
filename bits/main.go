@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 func CountSetBits(x int) int {
 	// Hamming weight (pop count)
@@ -15,6 +18,10 @@ func CountSetBits(x int) int {
 }
 func CountBits(x int) int {
 	// time: O(log n), space: O(1)
+
+	if x == 0 {
+		return 1
+	}
 
 	count := 0
 	for x != 0 {
@@ -41,7 +48,21 @@ func DivByTwo(x int) int      { return x >> 1 }
 
 // temp
 
+func testCountBits() {
+	t := time.Now()
+	for i := range int(1e2) {
+		bitWidth := CountBits(i)
+		bitStr := fmt.Sprintf("%b", i)
+		if bitWidth != len(bitStr) {
+			fmt.Printf("CountBits failed: %v (%b) != %v (%s)\n", bitWidth, i, len(bitStr), bitStr)
+		}
+	}
+	fmt.Printf("test CountBits time: %v\n", time.Since(t))
+}
+
 func main() {
+	testCountBits()
+
 	x := 0b1100011
 	fmt.Printf("%b\n", x)
 	fmt.Printf("%b\n", SetBit(x, 3))
