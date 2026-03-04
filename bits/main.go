@@ -40,11 +40,12 @@ func OffTrailingOnes(x int) int  { return x & (x + 1) }
 func FlipLastUnsetBit(x int) int { return x | (x + 1) }
 func SetKBits(k int) int         { return (1 << k) - 1 }
 
-func LowestBit(x int) int { return x & -x }
+func RightmostSetBit(x int) int { return x & -x } // LowestSetBit
 
 func PowerOfTwo(x int) int    { return 1 << x }
 func IsPowerOfTwo(x int) bool { return x > 0 && x&(x-1) == 0 }
 func DivByTwo(x int) int      { return x >> 1 }
+func MulByTwo(x int) int      { return x << 1 }
 
 // temp
 
