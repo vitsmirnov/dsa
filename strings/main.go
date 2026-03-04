@@ -9,7 +9,21 @@ import (
 func KMP(s, target string) int   { return 0 }
 func Hash(s string, mod int) int { return 0 }
 
-func IntToStr(n int, base int) string {
+func IntToDecStr(n int) string { return IntToStr(n, 10, 0) }
+func IntToBinStr(n int) string { return IntToStr(n, 2, 0) }
+func IntToOctStr(n int, upper bool) string {
+	if upper {
+		return IntToStr(n, 8, 'A')
+	}
+	return IntToStr(n, 8, 'a')
+}
+func IntToHexStr(n int, upper bool) string {
+	if upper {
+		return IntToStr(n, 16, 'A')
+	}
+	return IntToStr(n, 16, 'a')
+}
+func IntToStr(n int, base int, startLetter byte) string {
 	// time: O(log n), space: O(log n)
 
 	if n == 0 {
@@ -22,7 +36,7 @@ func IntToStr(n int, base int) string {
 		if digit < 10 {
 			res = append(res, byte(digit)+'0')
 		} else {
-			res = append(res, byte(digit-10)+'a')
+			res = append(res, byte(digit-10)+startLetter)
 		}
 	}
 	for l, r := 0, len(res)-1; l < r; l, r = l+1, r-1 {
@@ -33,7 +47,7 @@ func IntToStr(n int, base int) string {
 
 func testIntToStr() {
 	test := func(n int, base int, format string) {
-		r1 := IntToStr(n, base)
+		r1 := IntToStr(n, base, 'a')
 		r2 := fmt.Sprintf(format, n)
 		if r1 != r2 {
 			fmt.Printf("IntToStr failed: (n = %v, base = %v) %q != %q\n", n, base, r1, r2)
