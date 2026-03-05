@@ -1,162 +1,164 @@
 package main
 
-// Definition for a binary tree node.
-type TreeNode struct {
-	Val   int
-	Left  *TreeNode
-	Right *TreeNode
+type BSTreeNode struct {
+	val         int
+	left, right *BSTreeNode
+	// size int
 }
 
-// varsion 2 (Day-Stout-Warren algorithm (in place))
-
-func balanceBST2(root *TreeNode) *TreeNode {
-	// time: O(n), space: O(1)
-
-	makeRightVine3(&root)
-	nodeCount := countVineNodes(root)
-	m := 1
-	for m < nodeCount+1 {
-		m <<= 1
-	}
-	m = (m >> 1) - 1 // number of nodes in the closest perfectly balanced tree
-
-	doLeftRotations3(&root, nodeCount-m)
-	for ; m > 1; m /= 2 {
-		doLeftRotations3(&root, m/2)
-	}
-	return root
+type BSTree struct {
+	root *BSTreeNode
+	// size int
 }
 
-func doLeftRotations3(root **TreeNode, count int) {
-	for range count {
-		*root = rotateLeft(*root)
-		root = &(*root).Right
+func MakeBSTree() BSTree {
+	return BSTree{root: nil}
+}
+
+func (t *BSTree) Add(val int) {
+	// time: O(h), space: O(1)
+
+	node := t.findNode(val)
+	if *node == nil {
+		*node = &BSTreeNode{val: val, left: nil, right: nil}
 	}
 }
 
-func doLeftRotations2(root *TreeNode, count int) *TreeNode {
-	dummy := &TreeNode{Left: nil, Right: root}
-	cur := dummy
-	for range count {
-		cur.Right = rotateLeft(cur.Right)
-		cur = cur.Right
+func (t *BSTree) Remove(val int) {
+	// time: O(h), space: O(1)
+
+	node := t.findNode(val)
+	if *node == nil {
+		return
 	}
-	return dummy.Right
+
+	if (**node).right == nil {
+		*node = (**node).left
+	} else if (**node).left == nil {
+		*node = (**node).right
+	} else {
+		minRight := &(**node).right
+		for (**minRight).left != nil {
+			minRight = &(**minRight).left
+		}
+		(**node).val = (**minRight).val
+		*minRight = (**minRight).right
+	}
 }
 
-func doLeftRotations1(root *TreeNode, count int) *TreeNode {
-	root = rotateLeft(root)
-	cur := root
-	for range count - 1 {
-		cur.Right = rotateLeft(cur.Right)
-		cur = cur.Right
-	}
-	return root
+func (t *BSTree) Exist(val int) bool {
+	// time: O(h), space: O(1)
+
+	return *t.findNode(val) != nil
 }
 
-func makeRightVine3(root **TreeNode) {
-	for ; *root != nil; root = &(*root).Right {
-		for (*root).Left != nil {
-			*root = rotateRight(*root)
+func (t *BSTree) findNode(val int) **BSTreeNode {
+	// time: O(h), space: O(1)
+
+	node := &t.root
+	for *node != nil && (*node).val != val {
+		if val < (*node).val {
+			node = &(*node).left
+		} else { // val > (*node).val
+			node = &(*node).right
+		}
+	}
+	return node
+}
+
+func (t *BSTree) Add1(val int) {
+	if t.root == nil {
+		t.root = &BSTreeNode{val: val, left: nil, right: nil}
+		return
+	}
+	node := t.root
+	for {
+		if val < node.val {
+			if node.left == nil {
+				node.left = &BSTreeNode{val: val, left: nil, right: nil}
+				return
+			} else {
+				node = node.left
+			}
+		} else if val > node.val {
+			if node.right == nil {
+				node.right = &BSTreeNode{val: val, left: nil, right: nil}
+				return
+			} else {
+				node = node.right
+			}
+		} else {
+			return
 		}
 	}
 }
 
-func makeRightVine2(root *TreeNode) *TreeNode {
-	dummy := &TreeNode{Left: nil, Right: root}
-	for node := dummy; node.Right != nil; {
-		for node.Right.Left != nil {
-			node.Right = rotateRight(node.Right)
-		}
-		node = node.Right
-	}
-	return dummy.Right
-}
-
-func makeRightVine1(root *TreeNode) *TreeNode {
-	for root.Left != nil {
-		root = rotateRight(root)
-	}
-	for cur := root; cur.Right != nil; cur = cur.Right {
-		for cur.Right.Left != nil {
-			cur.Right = rotateRight(cur.Right)
+func (t *BSTree) Exist1(val int) bool {
+	node := t.root
+	for node != nil {
+		if val < node.val {
+			node = node.left
+		} else if val > node.val {
+			node = node.right
+		} else {
+			return true
 		}
 	}
-	return root
+	return false
 }
 
-func rotateRight(root *TreeNode) *TreeNode {
-	if root == nil {
-		return nil
-	}
-	if root.Left == nil {
+// temp
+
+func deleteNode(root *TreeNode, key int) *TreeNode {
+	// time: O(h), space: O(1)
+
+	node := findNode(&root, key)
+	if *node == nil {
 		return root
 	}
-	res := root.Left
-	right := res.Right
-	res.Right = root
-	root.Left = right
-	return res
-}
 
-func rotateLeft(root *TreeNode) *TreeNode {
-	if root == nil {
-		return nil
+	if (**node).Right == nil {
+		*node = (**node).Left
+	} else if (**node).Left == nil {
+		*node = (**node).Right
+	} else {
+		minRight := &(**node).Right
+		for (**minRight).Left != nil {
+			minRight = &(**minRight).Left
+		}
+		(**node).Val = (**minRight).Val
+		*minRight = (**minRight).Right
 	}
-	if root.Right == nil {
-		return root
-	}
-	res := root.Right
-	left := res.Left
-	res.Left = root
-	root.Right = left
-	return res
+	return root
 }
 
-func countVineNodes(root *TreeNode) int {
-	count := 0
-	for ; root != nil; root = root.Right {
-		count++
-	}
-	return count
-}
+func findNode(root **TreeNode, key int) **TreeNode {
+	// time: O(h), space: O(1)
 
-func countNodes(root *TreeNode) int {
-	if root == nil {
-		return 0
-	}
-	return 1 + countNodes(root.Left) + countNodes(root.Right)
-}
-
-// version 1 (reconstruction: inorder traversal + recursive construction)
-
-func balanceBST(root *TreeNode) *TreeNode {
-	// time: O(n), space: O(n)
-
-	return balance(treeToArray(root))
-}
-
-func balance(nums []int) *TreeNode {
-	if len(nums) == 0 {
-		return nil
-	}
-	i := len(nums) / 2
-	return &TreeNode{
-		Val:   nums[i],
-		Left:  balance(nums[:i]),
-		Right: balance(nums[i+1:])}
-}
-
-func treeToArray(root *TreeNode) []int {
-	res := []int{}
-	var dfs func(root *TreeNode)
-	dfs = func(root *TreeNode) {
-		if root != nil {
-			dfs(root.Left)
-			res = append(res, root.Val)
-			dfs(root.Right)
+	for *root != nil && (**root).Val != key {
+		if key < (**root).Val {
+			root = &(**root).Left
+		} else { // key > (**root).Val
+			root = &(**root).Right
 		}
 	}
-	dfs(root)
-	return res
+	return root
 }
+
+//  temp
+
+// func addBSTNode(root *BSTreeNode, val int) *BSTreeNode {
+//     if root == nil {
+//         return &BSTreeNode{
+//             val: val,
+//             left: nil,
+//             right: nil}
+//     }
+//     if val < root.val {
+//         return addBSTNode(root.left, val)
+//     } else if val > root.val {
+//         return addBSTNode(root.right, val)
+//     } else {
+//         return root
+//     }
+// }
