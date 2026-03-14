@@ -171,6 +171,8 @@ func Sieve2(n int) []bool {
 
 // greatest common divisor
 func GCD(a, b int) int {
+	// time: O(log min(a,b)), space: O(1)
+
 	for b != 0 {
 		a, b = b, a%b
 	}
@@ -178,6 +180,8 @@ func GCD(a, b int) int {
 }
 
 func GCD2(a, b int) int {
+	// time: O(log min(a,b)), space: O(log min(a,b))
+
 	if b == 0 {
 		return a
 	}
