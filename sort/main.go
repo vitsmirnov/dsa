@@ -59,4 +59,5 @@ func main() {
 	testSortDefault(MergeSort, "merge")
 	testSortDefault(QuickSort, "quick")
 	testSortDefault(CountingSort, "counting")
+	testSortDefault(RadixSort, "radix")
 }
