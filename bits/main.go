@@ -30,6 +30,11 @@ func CountBits(x int) int {
 	}
 	return count
 }
+func HammingDistance(x int, y int) int {
+	// time: O(log max(x,y)), space: O(1)
+
+	return CountSetBits(x ^ y)
+}
 
 func SetBit(x int, pos int) int  { return x | (1 << pos) }
 func OffBit(x int, pos int) int  { return x & ^(1 << pos) }
