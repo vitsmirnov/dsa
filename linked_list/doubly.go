@@ -50,3 +50,5 @@ func (l *LinkedList[T]) MoveToBack(node *LinkedListNode[T]) {
 	node.next = nil
 	l.pushBack(node)
 }
+
+// todo: iterator
