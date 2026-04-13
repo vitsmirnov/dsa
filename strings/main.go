@@ -6,8 +6,35 @@ import (
 )
 
 // Knuth-Morris-Pratt
-func KMP(s, target string) int   { return 0 }
-func Hash(s string, mod int) int { return 0 }
+func KMP(s, target string) int { return 0 }
+
+const mod int = 1e9 + 7
+const mod2 int = 1e9 + 9
+const primeBase = 257 // 31
+
+func CustomHash(s string, base int, mod int) int {
+	// time: O(n), space: O(1)
+
+	hash := 0
+	for i := range s {
+		hash = (hash*base + int(s[i]) + 1) % mod
+	}
+	return hash
+}
+func CustomHash2(s string, base int, mod int, ord func(c byte) int) int {
+	// time: O(n), space: O(1)
+
+	hash := 0
+	for i := range s {
+		hash = (hash*base + ord(s[i])) % mod
+	}
+	return hash
+}
+func Hash(s string) int {
+	// time: O(n), space: O(1)
+
+	return CustomHash(s, primeBase, mod)
+}
 
 func IntToDecStr(n int) string { return IntToStr(n, 10, 0) }
 func IntToBinStr(n int) string { return IntToStr(n, 2, 0) }
