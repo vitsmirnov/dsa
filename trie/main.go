@@ -54,6 +54,33 @@ func (this *Trie) Exists(word string) bool {
 	return node != nil && node.isWordEnd
 }
 
+func (this *Trie) Exists2(word string, maxHammingDist int) bool {
+	wordLen := len(word)
+
+	var dfs func(node *TrieNode, pos int, hamDist int) bool
+	dfs = func(node *TrieNode, pos int, hamDist int) bool {
+		if node == nil || hamDist < 0 {
+			return false
+		}
+		if pos == wordLen {
+			return node.isWordEnd
+		}
+
+		c := int(word[pos] - 'a')
+		if dfs(node.children[c], pos+1, hamDist) {
+			return true
+		}
+		for i, child := range node.children {
+			if i != c && dfs(child, pos+1, hamDist-1) {
+				return true
+			}
+		}
+		return false
+	}
+
+	return dfs(this.root, 0, maxHammingDist)
+}
+
 func (this *Trie) StartsWith(prefix string) bool {
 	// time: O(|word|), space: O(1)
 
