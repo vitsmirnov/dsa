@@ -5,8 +5,14 @@ import "fmt"
 const alphabetLen = 'z' - 'a' + 1
 
 type TrieNode struct {
-	children [alphabetLen]*TrieNode
-	wordEnd  bool
+	children  []*TrieNode
+	isWordEnd bool
+}
+
+func MakeTrieNode() *TrieNode {
+	return &TrieNode{
+		children:  make([]*TrieNode, alphabetLen),
+		isWordEnd: false}
 }
 
 type Trie struct {
@@ -14,24 +20,24 @@ type Trie struct {
 }
 
 func MakeTrie() *Trie {
-	return &Trie{root: &TrieNode{}}
+	return &Trie{root: MakeTrieNode()}
 }
 
-func (this *Trie) Insert(word string) {
+func (this *Trie) Add(word string) {
 	// time: O(|word|), space: O(|word|)
 
 	node := this.root
 	for i := range word {
 		c := word[i] - 'a'
 		if node.children[c] == nil {
-			node.children[c] = &TrieNode{}
+			node.children[c] = MakeTrieNode()
 		}
 		node = node.children[c]
 	}
-	node.wordEnd = true
+	node.isWordEnd = true
 }
 
-func (this *Trie) SearchNode(word string) *TrieNode {
+func (this *Trie) FindNode(word string) *TrieNode {
 	// time: O(|word|), space: O(1)
 
 	node := this.root
@@ -41,17 +47,17 @@ func (this *Trie) SearchNode(word string) *TrieNode {
 	return node
 }
 
-func (this *Trie) Search(word string) bool {
+func (this *Trie) Exists(word string) bool {
 	// time: O(|word|), space: O(1)
 
-	node := this.SearchNode(word)
-	return node != nil && node.wordEnd
+	node := this.FindNode(word)
+	return node != nil && node.isWordEnd
 }
 
 func (this *Trie) StartsWith(prefix string) bool {
 	// time: O(|word|), space: O(1)
 
-	return this.SearchNode(prefix) != nil
+	return this.FindNode(prefix) != nil
 }
 
 func (this *Trie) GetWords() []string {
@@ -65,7 +71,7 @@ func (this *Trie) GetWords() []string {
 			return
 		}
 
-		if node.wordEnd {
+		if node.isWordEnd {
 			words = append(words, string(prefix))
 		}
 		for char, child := range node.children {
@@ -87,13 +93,13 @@ func demo() {
 	words := []string{"xy", "app", "apple", "beer", "add", "jam", "rental"}
 	trie := MakeTrie()
 	for _, word := range words {
-		trie.Insert(word)
+		trie.Add(word)
 	}
 	fmt.Println("Words:")
 	trie.Print()
 	fmt.Println()
 	word := "app"
-	fmt.Printf("Word %q is in the trie: %v\n", word, trie.Search(word))
+	fmt.Printf("Word %q is in the trie: %v\n", word, trie.Exists(word))
 	word = "ren"
 	fmt.Printf("Word with prefix %q is in the trie: %v\n", word, trie.StartsWith(word))
 	word = "xy"
