@@ -54,7 +54,8 @@ func (this *Trie) Exists(word string) bool {
 	return node != nil && node.isWordEnd
 }
 
-func (this *Trie) Exists2(word string, maxHammingDist int) bool {
+// It searches for similar words with hamming distance at most maxHammingDist
+func (this *Trie) ExistsSimilar(word string, maxHammingDist int) bool {
 	wordLen := len(word)
 
 	var dfs func(node *TrieNode, pos int, hamDist int) bool
@@ -79,6 +80,33 @@ func (this *Trie) Exists2(word string, maxHammingDist int) bool {
 	}
 
 	return dfs(this.root, 0, maxHammingDist)
+}
+
+// It check patterns like "he.l.", where "." could be any letter
+func (this *Trie) ExistsPattern(word string) bool {
+	wordLen := len(word)
+
+	var dfs func(node *TrieNode, pos int) bool
+	dfs = func(node *TrieNode, pos int) bool {
+		if node == nil {
+			return false
+		}
+		if pos == wordLen {
+			return node.isWordEnd
+		}
+
+		if word[pos] != '.' {
+			return dfs(node.children[word[pos]-'a'], pos+1)
+		}
+		for _, child := range node.children {
+			if dfs(child, pos+1) {
+				return true
+			}
+		}
+		return false
+	}
+
+	return dfs(this.root, 0)
 }
 
 func (this *Trie) StartsWith(prefix string) bool {
