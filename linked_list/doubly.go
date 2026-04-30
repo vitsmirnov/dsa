@@ -1,8 +1,8 @@
 package main
 
 type LinkedListNode[T any] struct {
-	data       T
-	prev, next *LinkedListNode[T]
+	Data       T
+	Prev, Next *LinkedListNode[T]
 }
 
 type LinkedList[T any] struct {
@@ -10,11 +10,13 @@ type LinkedList[T any] struct {
 	length      int
 }
 
-func (l *LinkedList[T]) Len() int { return l.length }
+func (l *LinkedList[T]) Len() int                  { return l.length }
+func (l *LinkedList[T]) Front() *LinkedListNode[T] { return l.front }
+func (l *LinkedList[T]) Back() *LinkedListNode[T]  { return l.back }
 
 func (l *LinkedList[T]) pushBack(node *LinkedListNode[T]) *LinkedListNode[T] {
 	if l.back != nil {
-		l.back.next = node
+		l.back.Next = node
 	} else {
 		l.front = node
 	}
@@ -24,30 +26,30 @@ func (l *LinkedList[T]) pushBack(node *LinkedListNode[T]) *LinkedListNode[T] {
 }
 
 func (l *LinkedList[T]) PushBack(value T) *LinkedListNode[T] {
-	return l.pushBack(&LinkedListNode[T]{data: value, prev: l.back, next: nil})
+	return l.pushBack(&LinkedListNode[T]{Data: value, Prev: l.back, Next: nil})
 }
 
 func (l *LinkedList[T]) PopFront() T { return l.Remove(l.front) }
 
 func (l *LinkedList[T]) Remove(node *LinkedListNode[T]) T {
-	if node.prev != nil {
-		node.prev.next = node.next
+	if node.Prev != nil {
+		node.Prev.Next = node.Next
 	} else {
-		l.front = node.next
+		l.front = node.Next
 	}
-	if node.next != nil {
-		node.next.prev = node.prev
+	if node.Next != nil {
+		node.Next.Prev = node.Prev
 	} else {
-		l.back = node.prev
+		l.back = node.Prev
 	}
 	l.length--
-	return node.data
+	return node.Data
 }
 
 func (l *LinkedList[T]) MoveToBack(node *LinkedListNode[T]) {
 	l.Remove(node)
-	node.prev = l.back
-	node.next = nil
+	node.Prev = l.back
+	node.Next = nil
 	l.pushBack(node)
 }
 
