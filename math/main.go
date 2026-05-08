@@ -128,6 +128,30 @@ func GetPrimeFactors(n int) []int {
 	return primes
 }
 
+func GetPrimeFactors2(n int) []int {
+	// time: O(sqrt(n)), space: O(1)
+
+	primes := []int{}
+	if n&1 == 0 {
+		primes = append(primes, 2)
+		for n&1 == 0 {
+			n >>= 1
+		}
+	}
+	for i := 3; i*i <= n; i += 2 {
+		if n%i == 0 {
+			primes = append(primes, i)
+			for n%i == 0 {
+				n /= i
+			}
+		}
+	}
+	if n > 1 {
+		primes = append(primes, n)
+	}
+	return primes
+}
+
 // sieve of Eratosthenes
 func Sieve(n int) []bool {
 	// time: O(n log log n), space: O(n)
