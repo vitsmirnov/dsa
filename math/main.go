@@ -193,6 +193,49 @@ func Sieve2(n int) []bool {
 	return primeTags
 }
 
+func GetLeastPrimeFactors(maxNum int) []int {
+	// time: O(n), space: O(n)
+	// hasn't been tested!
+
+	leastPrimeFactors := make([]int, maxNum+1)
+	primes := []int{}
+	for i := 2; i <= maxNum; i++ {
+		if leastPrimeFactors[i] == 0 {
+			leastPrimeFactors[i] = i
+			primes = append(primes, i)
+		}
+		// for _, prime := range primes {
+		// 	if prime*i > maxNum || prime > leastPrimeFactors[i] {
+		// 		break
+		// 	}
+		// 	leastPrimeFactors[prime*i] = prime
+		// }
+		for j := 0; primes[j]*i <= maxNum && primes[j] <= leastPrimeFactors[i]; j++ {
+			leastPrimeFactors[primes[j]*i] = primes[j]
+		}
+	}
+	return leastPrimeFactors
+}
+
+func GetPrimeFactorsViaLPF(num int, leastPrimeFactors []int) []int {
+	// time: O(log n), space: O(1) + ..
+	// hasn't been tested!
+
+	primes := []int{}
+	for num > 1 {
+		prime := leastPrimeFactors[num]
+		if len(primes) == 0 || primes[len(primes)-1] != prime {
+			primes = append(primes, prime)
+		}
+		num /= prime
+	}
+	return primes
+}
+
+func testLPF() {
+	// todo
+}
+
 // greatest common divisor
 func GCD(a, b int) int {
 	// time: O(log min(a,b)), space: O(1)
