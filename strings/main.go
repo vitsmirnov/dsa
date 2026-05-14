@@ -6,7 +6,8 @@ import (
 )
 
 // Knuth-Morris-Pratt
-func KMP(s, target string) int { return 0 }
+func KMP(text, target string) []int       { return nil }
+func RabinKarp(text, target string) []int { return nil }
 
 const mod int = 1e9 + 7
 const mod2 int = 1e9 + 9
