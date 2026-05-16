@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
+	"math/rand/v2"
 	"time"
 )
 
 // Knuth-Morris-Pratt
-func KMP(text, target string) []int       { return nil }
-func RabinKarp(text, target string) []int { return nil }
+func KMP(text, target string) []int { return nil }
 
 const mod int = 1e9 + 7
 const mod2 int = 1e9 + 9
@@ -73,6 +73,64 @@ func IntToStr(n int, base int, startLetter byte) string {
 	return string(res)
 }
 
+const LowercaseLetters = "abcdefghijklmnopqrstuvwxyz"
+const UppercaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+const Digits = "0123456789"
+const Symbols = " .,!?;:-_+=<>*&@$#%()[]{}/^|~`'" // " .,!?;:-_+=<>*&@$#%№()[]{}\\/^|~`'\""
+const AllLetters = LowercaseLetters + UppercaseLetters
+const LettersAndDigits = AllLetters + Digits
+const AllChars = LettersAndDigits + Symbols
+
+func GenerateRandomStringFromChars(length int, chars string) []byte {
+	charCount := len(chars)
+	s := make([]byte, length)
+	for i := range s {
+		s[i] = chars[rand.IntN(charCount)]
+	}
+	return s
+}
+
+func GenerateRandomString(length int) []byte {
+	return GenerateRandomStringFromChars(length, AllChars)
+}
+
+func FindSubstrings(text, target string) []int {
+	textLen, targetLen := len(text), len(target)
+	if targetLen > textLen {
+		return []int{}
+	}
+
+	indices := []int{}
+	for i := range textLen - targetLen + 1 {
+		if text[i:i+targetLen] == target {
+			indices = append(indices, i)
+		}
+	}
+	return indices
+}
+
+func RabinKarp(text, target string) []int {
+	return nil
+}
+
+func testFindSubstrings() {
+	const textLen int = 1e7
+	const targetLen int = 100000
+	text := GenerateRandomStringFromChars(textLen, LettersAndDigits)
+	target := GenerateRandomStringFromChars(targetLen, LettersAndDigits)
+	for range 1000 {
+		start := rand.IntN(textLen - targetLen + 1)
+		for i := range targetLen {
+			text[i+start] = target[i]
+		}
+	}
+	t := time.Now()
+	indices := FindSubstrings(string(text), string(target))
+	// fmt.Printf("FindSubstrings: %v occurrences found: %v\n", len(indices), indices)
+	fmt.Printf("FindSubstrings: %v occurrences found\n", len(indices))
+	fmt.Printf("testFindSubstrings time: %v\n", time.Since(t))
+}
+
 func testIntToStr() {
 	test := func(n int, base int, format string) {
 		r1 := IntToStr(n, base, 'a')
@@ -97,5 +155,21 @@ func testIntToStr() {
 }
 
 func main() {
+	// for c := range 256 {
+	// 	fmt.Printf("%c", c)
+	// }
+	// fmt.Println()
+	// fmt.Printf("%q\n", GenerateRandomStringFromChars(50, LowercaseLetters))
+	// fmt.Printf("%q\n", GenerateRandomStringFromChars(50, UppercaseLetters))
+	// fmt.Printf("%q\n", GenerateRandomStringFromChars(50, AllLetters))
+	// fmt.Printf("%q\n", GenerateRandomStringFromChars(50, Digits))
+	// fmt.Printf("%q\n", GenerateRandomStringFromChars(50, LettersAndDigits))
+	// fmt.Printf("%q\n", GenerateRandomStringFromChars(50, Symbols))
+	// fmt.Printf("%q\n", GenerateRandomStringFromChars(50, AllChars))
+	// fmt.Printf("%q\n", GenerateRandomStringFromChars(50, LowercaseLetters+" .,"))
+	// fmt.Printf("%q\n", GenerateRandomStringFromChars(50, Digits+"+-*/=()"))
+
+	testFindSubstrings()
+	return
 	testIntToStr()
 }
