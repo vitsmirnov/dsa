@@ -204,12 +204,6 @@ func GetLeastPrimeFactors(maxNum int) []int {
 			leastPrimeFactors[i] = i
 			primes = append(primes, i)
 		}
-		// for _, prime := range primes {
-		// 	if prime*i > maxNum || prime > leastPrimeFactors[i] {
-		// 		break
-		// 	}
-		// 	leastPrimeFactors[prime*i] = prime
-		// }
 		for j := 0; primes[j]*i <= maxNum && primes[j] <= leastPrimeFactors[i]; j++ {
 			leastPrimeFactors[primes[j]*i] = primes[j]
 		}
