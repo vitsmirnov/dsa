@@ -3,11 +3,14 @@ package main
 import (
 	"fmt"
 	"math/rand/v2"
+	"slices"
 	"time"
 )
 
+// todo:
 // Knuth-Morris-Pratt
-func KMP(text, target string) []int { return nil }
+func KMP(text, target string) []int    { return nil }
+func TwoWay(text, target string) []int { return nil }
 
 const mod int = 1e9 + 7
 const mod2 int = 1e9 + 9
@@ -109,26 +112,66 @@ func FindSubstrings(text, target string) []int {
 	return indices
 }
 
+func AreStringsEqual(s1, s2 string) bool {
+	if len(s1) != len(s2) {
+		return false
+	}
+
+	for i := range s1 {
+		if s1[i] != s2[i] {
+			return false
+		}
+	}
+	return true
+}
+
 func RabinKarp(text, target string) []int {
-	return nil
+	textLen, targetLen := len(text), len(target)
+	if targetLen > textLen {
+		return []int{}
+	}
+
+	targetHash, textHash := 0, 0
+	pow := 1
+	for i := range target {
+		targetHash = (targetHash*primeBase + int(target[i])) % mod
+		textHash = (textHash*primeBase + int(text[i])) % mod
+		pow = (pow * primeBase) % mod
+	}
+	indices := []int{}
+	if targetHash == textHash && target == text[:targetLen] {
+		indices = append(indices, 0)
+	}
+	for i := targetLen; i < textLen; i++ {
+		textHash = (textHash*primeBase + int(text[i])) % mod
+		textHash = (textHash - (int(text[i-targetLen])*pow)%mod + mod) % mod
+		if targetHash == textHash && target == text[i-targetLen+1:i+1] {
+			indices = append(indices, i-targetLen+1)
+		}
+	}
+	return indices
 }
 
 func testFindSubstrings() {
-	const textLen int = 1e7
-	const targetLen int = 100000
-	text := GenerateRandomStringFromChars(textLen, LettersAndDigits)
-	target := GenerateRandomStringFromChars(targetLen, LettersAndDigits)
-	for range 1000 {
+	const textLen int = 1e8
+	const targetLen int = 1000
+	text := GenerateRandomStringFromChars(textLen, LowercaseLetters)
+	target := GenerateRandomStringFromChars(targetLen, LowercaseLetters)
+	for range 10000 {
 		start := rand.IntN(textLen - targetLen + 1)
 		for i := range targetLen {
 			text[i+start] = target[i]
 		}
 	}
 	t := time.Now()
-	indices := FindSubstrings(string(text), string(target))
-	// fmt.Printf("FindSubstrings: %v occurrences found: %v\n", len(indices), indices)
-	fmt.Printf("FindSubstrings: %v occurrences found\n", len(indices))
-	fmt.Printf("testFindSubstrings time: %v\n", time.Since(t))
+	indices1 := FindSubstrings(string(text), string(target))
+	d1 := time.Since(t)
+	t = time.Now()
+	indices2 := RabinKarp(string(text), string(target))
+	d2 := time.Since(t)
+	fmt.Printf("FindSubstrings: time: %v, occurrences found: %v\n", d1, len(indices1))
+	fmt.Printf("RabinKarp: time: %v, occurrences found: %v\n", d2, len(indices2))
+	fmt.Printf("indeces are equal: %v\n", slices.Equal(indices1, indices2))
 }
 
 func testIntToStr() {
@@ -171,5 +214,6 @@ func main() {
 
 	testFindSubstrings()
 	return
+
 	testIntToStr()
 }
