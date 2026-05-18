@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"math"
+	"math/big"
+	"math/rand/v2"
 	"slices"
 	"time"
 )
@@ -439,6 +441,77 @@ func Factorial(n int) int {
 
 func IsPowerOfTwo(x int) bool { return x > 0 && x&(x-1) == 0 }
 
+func StrNumToDigits(num string, base int) []int {
+	// time: O(n^2), space: O(1) + O(n)
+	// n - len(num)
+
+	if num == "0" {
+		return []int{0}
+	}
+
+	digits := []int{}
+	var digit int
+	for num != "0" {
+		num, digit = StrNumDivMod(num, base)
+		digits = append(digits, digit)
+	}
+	for l, r := 0, len(digits)-1; l < r; l, r = l+1, r-1 {
+		digits[l], digits[r] = digits[r], digits[l]
+	}
+	return digits
+}
+
+func StrNumDivMod(num string, div int) (quotient string, remainder int) {
+	// time: O(n), space: O(1) + O(n)
+	// n - len(num)
+
+	digitCount := len(num)
+	res := []byte{}
+	n := 0
+	for i := 0; i < digitCount; {
+		n = n*10 + int(num[i]-'0')
+		i++
+		for i < digitCount && n < div {
+			n = n*10 + int(num[i]-'0')
+			if len(res) != 0 {
+				res = append(res, '0')
+			}
+			i++
+		}
+		res = append(res, byte(n/div)+'0')
+		n %= div
+	}
+	return string(res), n
+}
+
+func testDivMod() {
+	const aLen = 500
+	const maxB = 1000
+	a, b, c, m := new(big.Int), new(big.Int), new(big.Int), new(big.Int)
+	t := time.Now()
+	for range 10000 {
+		num := GenerateRandomLongNum(aLen)
+		div := rand.IntN(maxB) + 1
+		a.SetString(num, 10)
+		b.SetInt64(int64(div))
+		c.DivMod(a, b, m)
+		res, rem := StrNumDivMod(num, div)
+		if res != c.String() || rem != int(m.Int64()) {
+			fmt.Printf("divMod failed: %v / %v = %v (%v), should be: %v (%v)\n",
+				num, div, res, rem, c, m)
+		}
+	}
+	fmt.Printf("testDivMod() time: %v\n", time.Since(t))
+}
+
+func GenerateRandomLongNum(length int) string {
+	num := make([]byte, length)
+	for i := range num {
+		num[i] = byte(rand.IntN(10)) + '0'
+	}
+	return string(num)
+}
+
 func testSieve() {
 	const maxNum int = 1e5
 	const loopCount = 1000
@@ -535,9 +608,8 @@ func testPow() {
 
 func main() {
 	testSieve()
-	return
-
 	testPow()
+	testDivMod()
 	return
 
 	// x := 3710
