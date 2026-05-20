@@ -1,23 +1,40 @@
 package main
 
+import (
+	"fmt"
+	"math/rand/v2"
+	"time"
+)
+
+func MakeMinSparseTable(nums []int) *SparseTable {
+	return MakeSparseTable(nums, func(a, b int) int { return min(a, b) })
+}
+func MakeMaxSparseTable(nums []int) *SparseTable {
+	return MakeSparseTable(nums, func(a, b int) int { return max(a, b) })
+}
+
 type SparseTable struct {
 	mins [][]int
 	logs []int
+	f    func(int, int) int
 }
 
-func MakeSparseTable(nums []int) *SparseTable {
+func MakeSparseTable(nums []int, f func(int, int) int) *SparseTable {
 	numsLen := len(nums)
+	if numsLen == 0 {
+		return nil
+	}
+
+	logs := make([]int, numsLen+1)
+	logs[1] = 0
+	for i := 2; i <= numsLen; i++ {
+		logs[i] = logs[i>>1] + 1
+	}
+
 	// p := 0
 	// for (1 << p) <= numsLen {
 	// 	p++
 	// }
-
-	logs := make([]int, numsLen+1)
-	logs[1] = 0
-	for i := 2; i < len(logs); i++ {
-		logs[i] = logs[i>>1] + 1
-	}
-
 	p := logs[numsLen] + 1
 	mins := make([][]int, p)
 	mins[0] = make([]int, numsLen)
@@ -25,34 +42,69 @@ func MakeSparseTable(nums []int) *SparseTable {
 	for i := 1; i < p; i++ {
 		mins[i] = make([]int, numsLen)
 		for j := numsLen - (1 << i); j >= 0; j-- {
-			mins[i][j] = min(mins[i-1][j], mins[i-1][j+(1<<(i-1))])
+			mins[i][j] = f(mins[i-1][j], mins[i-1][j+(1<<(i-1))])
 		}
 	}
 
 	return &SparseTable{
 		mins: mins,
-		logs: logs}
+		logs: logs,
+		f:    f}
 }
-func (st *SparseTable) Min(left, right int) int {
+
+// min/max
+func (st *SparseTable) Query(left, right int) int {
 	l := st.logs[right-left+1]
-	return min(st.mins[l][left], st.mins[l][right-left+1])
+	// return st.f(st.mins[l][left], st.mins[l][right-left+1])
+	return st.f(st.mins[l][left], st.mins[l][right-(1<<l)+1])
 }
 
 // sum would be like that
-// func (st *SparseTable) Sum(left, right int) int {
-// 	return st.mins[][left]
-// }
-
-func testSparseTable() {
-
+func (st *SparseTable) Sum(left, right int) int {
+	// length := right - left + 1
+	sum := 0
+	return sum
 }
 
-func getMin(nums []int) int {
-	minNum := nums[0]
-	for _, num := range nums {
-		minNum = min(minNum, num)
+func testSparseTable() {
+	const minNum int = -1e5
+	const maxNum int = 1e5
+	const numsRange = maxNum - minNum + 1
+	const numsLen int = 1e5
+	const testCount int = 100
+	const queryCount int = 100
+	// funcs := [2]func(int, int) int{min, max}
+	funcs := [2]func(int, int) int{
+		func(a, b int) int { return min(a, b) },
+		func(a, b int) int { return max(a, b) }}
+	nums := make([]int, numsLen)
+	t := time.Now()
+	for range testCount {
+		for i := range nums {
+			nums[i] = rand.IntN(numsRange) + minNum
+		}
+		f := funcs[rand.IntN(len(funcs))]
+		st := MakeSparseTable(nums, f)
+		for range queryCount {
+			length := rand.IntN(numsLen-1) + 1
+			left := rand.IntN(numsLen)
+			right := min(left+length-1, numsLen-1)
+			res1 := st.Query(left, right)
+			res2 := agr(nums[left:right+1], f)
+			if res1 != res2 {
+				fmt.Printf("%v != %v: [%v, %v]\n", res1, res2, left, right)
+			}
+		}
 	}
-	return minNum
+	fmt.Printf("testSparseTable time: %v\n", time.Since(t))
+}
+
+func agr(nums []int, f func(int, int) int) int {
+	res := nums[0]
+	for _, num := range nums[1:] {
+		res = f(res, num)
+	}
+	return res
 }
 
 func main() {
@@ -64,6 +116,13 @@ func main() {
 	// for i, log := range logs {
 	// 	fmt.Printf("%v: %v\n", i, log)
 	// }
+
+	// nums := []int{1, 2, 3, 4, 5, 6, 7}
+	// numsLen := len(nums)
+	// st := MakeSparseTable(nums, func(a, b int) int { return min(a, b) })
+	// fmt.Println(nums)
+	// fmt.Println(st.Query(0, numsLen-1))
+	// return
 
 	testSparseTable()
 }
