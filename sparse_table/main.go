@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/bits"
 	"math/rand/v2"
 	"time"
 )
@@ -15,8 +16,8 @@ func MakeMaxSparseTable(nums []int) *SparseTable {
 
 type SparseTable struct {
 	mins [][]int
-	logs []int
-	f    func(int, int) int
+	// logs []int
+	f func(int, int) int
 }
 
 func MakeSparseTable(nums []int, f func(int, int) int) *SparseTable {
@@ -25,38 +26,36 @@ func MakeSparseTable(nums []int, f func(int, int) int) *SparseTable {
 		return nil
 	}
 
-	logs := make([]int, numsLen+1)
-	logs[1] = 0
-	for i := 2; i <= numsLen; i++ {
-		logs[i] = logs[i>>1] + 1
-	}
-
-	// p := 0
-	// for (1 << p) <= numsLen {
-	// 	p++
+	// logs := make([]int, numsLen+1)
+	// logs[1] = 0
+	// for i := 2; i <= numsLen; i++ {
+	// 	logs[i] = logs[i>>1] + 1
 	// }
-	p := logs[numsLen] + 1
-	mins := make([][]int, p)
+
+	// levelCount := logs[numsLen] + 1
+	levelCount := bits.Len(uint(numsLen))
+	mins := make([][]int, levelCount)
 	mins[0] = make([]int, numsLen)
 	copy(mins[0], nums)
-	for i := 1; i < p; i++ {
-		mins[i] = make([]int, numsLen)
-		prevLevel := i - 1
+	for level := 1; level < levelCount; level++ {
+		mins[level] = make([]int, numsLen)
+		prevLevel := level - 1
 		prevLevelLen := 1 << prevLevel
-		for j := numsLen - (1 << i); j >= 0; j-- {
-			mins[i][j] = f(mins[prevLevel][j], mins[prevLevel][j+prevLevelLen])
+		for i := numsLen - (1 << level); i >= 0; i-- {
+			mins[level][i] = f(mins[prevLevel][i], mins[prevLevel][i+prevLevelLen])
 		}
 	}
 
 	return &SparseTable{
 		mins: mins,
-		logs: logs,
-		f:    f}
+		// logs: logs,
+		f: f}
 }
 
 // min/max
 func (st *SparseTable) Query(left, right int) int {
-	l := st.logs[right-left+1]
+	// l := st.logs[right-left+1]
+	l := bits.Len(uint(right-left+1)) - 1
 	return st.f(st.mins[l][left], st.mins[l][right-(1<<l)+1])
 }
 
@@ -78,6 +77,19 @@ func (st *SparseTable) Sum(left, right int) int {
 // 1 2 3 4 5 6 7
 // length: 5
 // 101
+
+func bitLength(n int) int {
+	if n == 0 {
+		return 1
+	}
+
+	count := 0
+	for n != 0 {
+		count++
+		n >>= 1
+	}
+	return count
+}
 
 func testSparseTable() {
 	const minNum int = -1e5
