@@ -41,8 +41,10 @@ func MakeSparseTable(nums []int, f func(int, int) int) *SparseTable {
 	copy(mins[0], nums)
 	for i := 1; i < p; i++ {
 		mins[i] = make([]int, numsLen)
+		prevLevel := i - 1
+		prevLevelLen := 1 << prevLevel
 		for j := numsLen - (1 << i); j >= 0; j-- {
-			mins[i][j] = f(mins[i-1][j], mins[i-1][j+(1<<(i-1))])
+			mins[i][j] = f(mins[prevLevel][j], mins[prevLevel][j+prevLevelLen])
 		}
 	}
 
@@ -61,10 +63,22 @@ func (st *SparseTable) Query(left, right int) int {
 
 // sum would be like that
 func (st *SparseTable) Sum(left, right int) int {
-	// length := right - left + 1
 	sum := 0
+	length := right - left + 1
+	for i := 0; length != 0; i++ {
+		if length&1 == 1 {
+			sum += st.mins[i][left]
+			left += 1 << i
+		}
+		length >>= 1
+	}
 	return sum
 }
+
+//   l       r
+// 1 2 3 4 5 6 7
+// length: 5
+// 101
 
 func testSparseTable() {
 	const minNum int = -1e5
@@ -99,6 +113,35 @@ func testSparseTable() {
 	fmt.Printf("testSparseTable time: %v\n", time.Since(t))
 }
 
+func testSparseTableSum() {
+	const minNum int = -1e2
+	const maxNum int = 1e2
+	const numsRange = maxNum - minNum + 1
+	const numsLen int = 1e5
+	const testCount int = 100
+	const queryCount int = 500
+	nums := make([]int, numsLen)
+	sum := func(a, b int) int { return a + b }
+	t := time.Now()
+	for range testCount {
+		for i := range nums {
+			nums[i] = rand.IntN(numsRange) + minNum
+		}
+		st := MakeSparseTable(nums, sum)
+		for range queryCount {
+			length := rand.IntN(numsLen-1) + 1
+			left := rand.IntN(numsLen)
+			right := min(left+length-1, numsLen-1)
+			res1 := st.Sum(left, right)
+			res2 := agr(nums[left:right+1], sum)
+			if res1 != res2 {
+				fmt.Printf("%v != %v: [%v, %v]\n", res1, res2, left, right)
+			}
+		}
+	}
+	fmt.Printf("testSparseTableSum time: %v\n", time.Since(t))
+}
+
 func agr(nums []int, f func(int, int) int) int {
 	res := nums[0]
 	for _, num := range nums[1:] {
@@ -125,6 +168,7 @@ func main() {
 	// return
 
 	testSparseTable()
+	testSparseTableSum()
 }
 
 //            l             r
