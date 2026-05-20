@@ -1,7 +1,71 @@
 package main
 
-func main() {
+type SparseTable struct {
+	mins [][]int
+	logs []int
+}
 
+func MakeSparseTable(nums []int) *SparseTable {
+	numsLen := len(nums)
+	// p := 0
+	// for (1 << p) <= numsLen {
+	// 	p++
+	// }
+
+	logs := make([]int, numsLen+1)
+	logs[1] = 0
+	for i := 2; i < len(logs); i++ {
+		logs[i] = logs[i>>1] + 1
+	}
+
+	p := logs[numsLen] + 1
+	mins := make([][]int, p)
+	mins[0] = make([]int, numsLen)
+	copy(mins[0], nums)
+	for i := 1; i < p; i++ {
+		mins[i] = make([]int, numsLen)
+		for j := numsLen - (1 << i); j >= 0; j-- {
+			mins[i][j] = min(mins[i-1][j], mins[i-1][j+(1<<(i-1))])
+		}
+	}
+
+	return &SparseTable{
+		mins: mins,
+		logs: logs}
+}
+func (st *SparseTable) Min(left, right int) int {
+	l := st.logs[right-left+1]
+	return min(st.mins[l][left], st.mins[l][right-left+1])
+}
+
+// sum would be like that
+// func (st *SparseTable) Sum(left, right int) int {
+// 	return st.mins[][left]
+// }
+
+func testSparseTable() {
+
+}
+
+func getMin(nums []int) int {
+	minNum := nums[0]
+	for _, num := range nums {
+		minNum = min(minNum, num)
+	}
+	return minNum
+}
+
+func main() {
+	// logs := make([]int, 22)
+	// logs[1] = 0
+	// for i := 2; i < len(logs); i++ {
+	// 	logs[i] = logs[i>>1] + 1
+	// }
+	// for i, log := range logs {
+	// 	fmt.Printf("%v: %v\n", i, log)
+	// }
+
+	testSparseTable()
 }
 
 //            l             r
