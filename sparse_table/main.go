@@ -16,8 +16,7 @@ func MakeMaxSparseTable(nums []int) *SparseTable {
 
 type SparseTable struct {
 	mins [][]int
-	// logs []int
-	f func(int, int) int
+	f    func(int, int) int
 }
 
 func MakeSparseTable(nums []int, f func(int, int) int) *SparseTable {
@@ -26,13 +25,7 @@ func MakeSparseTable(nums []int, f func(int, int) int) *SparseTable {
 		return nil
 	}
 
-	// logs := make([]int, numsLen+1)
-	// logs[1] = 0
-	// for i := 2; i <= numsLen; i++ {
-	// 	logs[i] = logs[i>>1] + 1
-	// }
-
-	// levelCount := logs[numsLen] + 1
+	// levelCount := logs2[numsLen] + 1
 	levelCount := bits.Len(uint(numsLen))
 	mins := make([][]int, levelCount)
 	mins[0] = make([]int, numsLen)
@@ -48,13 +41,12 @@ func MakeSparseTable(nums []int, f func(int, int) int) *SparseTable {
 
 	return &SparseTable{
 		mins: mins,
-		// logs: logs,
-		f: f}
+		f:    f}
 }
 
 // min/max
 func (st *SparseTable) Query(left, right int) int {
-	// l := st.logs[right-left+1]
+	// l := st.logs2[right-left+1]
 	l := bits.Len(uint(right-left+1)) - 1
 	return st.f(st.mins[l][left], st.mins[l][right-(1<<l)+1])
 }
@@ -73,10 +65,14 @@ func (st *SparseTable) Sum(left, right int) int {
 	return sum
 }
 
-//   l       r
-// 1 2 3 4 5 6 7
-// length: 5
-// 101
+func calcLogs2(maxNum int) []int {
+	logs2 := make([]int, maxNum+1)
+	logs2[1] = 0
+	for i := 2; i <= maxNum; i++ {
+		logs2[i] = logs2[i>>1] + 1
+	}
+	return logs2
+}
 
 func bitLength(n int) int {
 	if n == 0 {
@@ -188,6 +184,11 @@ func main() {
 // 1 (2):  3  5  7  9 11 13
 // 2 (4): 10 14 18 22
 // 3 (8): X
+
+//   l       r
+// 1 2 3 4 5 6 7
+// length: 5
+// 101
 
 // ln
 // 1: 0
