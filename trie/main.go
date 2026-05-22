@@ -60,7 +60,7 @@ func (this *Trie) ExistsSimilar(word string, maxHammingDist int) bool {
 
 	var dfs func(node *TrieNode, pos int, hamDist int) bool
 	dfs = func(node *TrieNode, pos int, hamDist int) bool {
-		if node == nil || hamDist < 0 {
+		if node == nil || hamDist > maxHammingDist {
 			return false
 		}
 		if pos == wordLen {
@@ -68,18 +68,15 @@ func (this *Trie) ExistsSimilar(word string, maxHammingDist int) bool {
 		}
 
 		c := int(word[pos] - 'a')
-		if dfs(node.children[c], pos+1, hamDist) {
-			return true
-		}
 		for i, child := range node.children {
-			if i != c && dfs(child, pos+1, hamDist-1) {
+			if dfs(child, pos+1, hamDist+btoi(i != c)) {
 				return true
 			}
 		}
 		return false
 	}
 
-	return dfs(this.root, 0, maxHammingDist)
+	return dfs(this.root, 0, 0)
 }
 
 // It check patterns like "he.l.", where "." could be any letter
@@ -142,6 +139,13 @@ func (this *Trie) Print() {
 	for _, word := range this.GetWords() {
 		fmt.Println(word)
 	}
+}
+
+func btoi(b bool) int {
+	if b {
+		return 1
+	}
+	return 0
 }
 
 func demo() {
