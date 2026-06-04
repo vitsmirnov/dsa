@@ -31,10 +31,10 @@ func MakeSparseTable(nums []int, f func(int, int) int) *SparseTable {
 	mins[0] = make([]int, numsLen)
 	copy(mins[0], nums)
 	for level := 1; level < levelCount; level++ {
-		mins[level] = make([]int, numsLen)
+		mins[level] = make([]int, numsLen-(1<<level)+1)
 		prevLevel := level - 1
 		prevLevelLen := 1 << prevLevel
-		for i := numsLen - (1 << level); i >= 0; i-- {
+		for i := len(mins[level]) - 1; i >= 0; i-- {
 			mins[level][i] = f(mins[prevLevel][i], mins[prevLevel][i+prevLevelLen])
 		}
 	}
