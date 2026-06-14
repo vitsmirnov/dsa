@@ -15,6 +15,13 @@ type PriorityQueue[T any] struct {
 func NewPriorityQueue[T any](less func(a, b T) bool) *PriorityQueue[T] {
 	return &PriorityQueue[T]{items: []T{}, less: less}
 }
+func NewPriorityQueue2[T any](arr []T, less func(a, b T) bool) *PriorityQueue[T] {
+	pq := &PriorityQueue[T]{
+		items: arr,
+		less:  less}
+	heap.Init(pq)
+	return pq
+}
 func (pq *PriorityQueue[T]) Len() int           { return len(pq.items) }
 func (pq *PriorityQueue[T]) Less(i, j int) bool { return pq.less(pq.items[i], pq.items[j]) }
 func (pq *PriorityQueue[T]) Swap(i, j int)      { pq.items[i], pq.items[j] = pq.items[j], pq.items[i] }
