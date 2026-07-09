@@ -439,6 +439,24 @@ func Factorial(n int) int {
 	return res
 }
 
+func MulMatrices(a, b [][]int, mod int) [][]int {
+	ah, aw := len(a), len(a[0])
+	bw := len(b[0])
+	// handle bad input
+	res := make([][]int, ah)
+	for i := range res {
+		res[i] = make([]int, bw)
+		for j := range res[i] {
+			sum := 0
+			for p := range aw {
+				sum += a[i][p] * b[p][j]
+			}
+			res[i][j] = sum % mod
+		}
+	}
+	return res
+}
+
 func IsPowerOfTwo(x int) bool { return x > 0 && x&(x-1) == 0 }
 
 func StrNumToDigits(num string, base int) []int {
