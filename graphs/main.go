@@ -65,6 +65,64 @@ func FindBridges(n int, edges [][]int) [][]int {
 	return bridges
 }
 
+// https://leetcode.com/problems/clone-graph/description/
+type GraphNode struct {
+	Val       int
+	Neighbors []*GraphNode
+}
+
+func CloneGraph1(node *GraphNode) *GraphNode {
+	// time: O(e+v), space: O(e+v)
+
+	clones := map[*GraphNode]*GraphNode{nil: nil}
+
+	var getClone func(node *GraphNode) *GraphNode
+	getClone = func(node *GraphNode) *GraphNode {
+		if clone, has := clones[node]; has {
+			return clone
+		}
+		clone := &GraphNode{
+			Val:       node.Val,
+			Neighbors: make([]*GraphNode, len(node.Neighbors))}
+		clones[node] = clone
+		for i, neighbor := range node.Neighbors {
+			clone.Neighbors[i] = getClone(neighbor)
+		}
+		return clone
+	}
+
+	return getClone(node)
+}
+
+func CloneGraph2(node *GraphNode) *GraphNode {
+	// time: O(e+v), space: O(e+v)
+
+	if node == nil {
+		return nil
+	}
+
+	clones := map[*GraphNode]*GraphNode{node: {Val: node.Val}}
+	stack := []*GraphNode{node}
+	for len(stack) != 0 {
+		node := stack[len(stack)-1]
+		stack = stack[:len(stack)-1]
+		clone := clones[node]
+		for _, neighbor := range node.Neighbors {
+			if neighbor == nil {
+				continue
+			}
+			neighborClone, has := clones[neighbor]
+			if !has {
+				neighborClone = &GraphNode{Val: neighbor.Val}
+				clones[neighbor] = neighborClone
+				stack = append(stack, neighbor)
+			}
+			clone.Neighbors = append(clone.Neighbors, neighborClone)
+		}
+	}
+	return clones[node]
+}
+
 func main() {
 
 }
