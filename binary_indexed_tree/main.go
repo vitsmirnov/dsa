@@ -14,8 +14,8 @@ import (
 
 type BIT struct{ sums []int }
 
-func MakeBIT(size int) BIT { return BIT{sums: make([]int, size)} }
-func MakeBITFromNums(nums []int) BIT {
+func MakeBIT(size int) *BIT { return &BIT{sums: make([]int, size)} }
+func MakeBITFromNums(nums []int) *BIT {
 	size := len(nums)
 	sums := make([]int, size)
 	for i, num := range nums {
@@ -24,7 +24,7 @@ func MakeBITFromNums(nums []int) BIT {
 			sums[j] += sums[i]
 		}
 	}
-	return BIT{sums: sums}
+	return &BIT{sums: sums}
 }
 
 func (bit *BIT) Item(index int) int { return bit.Sum(index, index) }
