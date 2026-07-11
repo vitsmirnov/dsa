@@ -7,10 +7,15 @@ package main
 // Dijkstra
 // Bellman-Ford
 // Floyd-Warshall
+// topological sort
+//  Kahn's algorithm
+//  DFS
+// find cycles
 // MST
 //  Kraskal
 //  Prime
 // connected components
+// LCA
 // Euler's path?
 // binary lifting
 // clone
