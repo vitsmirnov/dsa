@@ -1,5 +1,10 @@
 package main
 
+import (
+	"math/bits"
+	"slices"
+)
+
 // todo:
 // DFS
 // BFS
@@ -126,6 +131,48 @@ func CloneGraph2(node *GraphNode) *GraphNode {
 		}
 	}
 	return clones[node]
+}
+
+// binary lifting
+// https://leetcode.com/problems/kth-ancestor-of-a-tree-node/
+
+type TreeAncestor struct {
+	ancestors [][]int
+}
+
+func Constructor(n int, parents []int) TreeAncestor {
+	// time: O(n log n), space: O(n log n)
+
+	jumpCount := bits.Len(uint(n))
+	ancestors := make([][]int, jumpCount)
+	ancestors[0] = slices.Clone(parents)
+	for i := 1; i < jumpCount; i++ {
+		ancestors[i] = make([]int, n)
+		for node := range n {
+			p := ancestors[i-1][node]
+			if p != -1 {
+				ancestors[i][node] = ancestors[i-1][p]
+			} else {
+				ancestors[i][node] = -1
+			}
+		}
+	}
+	return TreeAncestor{ancestors: ancestors}
+}
+
+func (this *TreeAncestor) GetKthAncestor(node int, k int) int {
+	// time: O(log n), space: O(1)
+
+	dist := 0
+	ancestor := node
+	for ancestor != -1 && k > 0 {
+		if k&1 == 1 {
+			ancestor = this.ancestors[dist][ancestor]
+		}
+		dist++
+		k >>= 1
+	}
+	return ancestor
 }
 
 func main() {
