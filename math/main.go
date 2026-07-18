@@ -252,7 +252,7 @@ func GCD2(a, b int) int {
 }
 
 // least common multiple
-func LCM(a, b int) int     { return Abs(a*b) / GCD(a, b) }
+func LCM(a, b int) int     { return Abs(a*b) / GCD(a, b) } // a / GCD(a, b) * b
 func DivCeil(a, b int) int { return (a + b - 1) / b }
 
 func Abs[T Number](x T) T {
