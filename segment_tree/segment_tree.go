@@ -1,78 +1,66 @@
 package main
 
-// type SegTreeItem struct{ min, max int }
-
-type SegmentTree[T any] struct {
+type SegmentTree[T any, E any] struct {
 	nodes     []T
-	initNode  func(val int) T
+	initNode  func(val E) T
 	buildNode func(leftChild, rightChild T) T
 	size      int
 }
 
-func MakeSegmentTree[T any](arr []int,
-	initNode func(val int) T,
-	buildNode func(leftChild, rightChild T) T) *SegmentTree[T] {
+func MakeSegmentTree[T any, E any](data []E,
+	initNode func(val E) T,
+	buildNode func(leftChild, rightChild T) T) *SegmentTree[T, E] {
 
-	size := len(arr)
-	st := &SegmentTree[T]{
+	size := len(data)
+	st := &SegmentTree[T, E]{
 		nodes:     make([]T, size*4),
 		initNode:  initNode,
 		buildNode: buildNode,
 		size:      size}
-	st.build(arr, 0, 0, size-1)
+	st.build(data, 0, 0, size-1)
 	return st
 }
 
-func (st *SegmentTree[T]) build(arr []int, pos int, left, right int) {
-
+func (st *SegmentTree[T, E]) build(data []E, pos int, left, right int) {
 	if left == right {
-		// st.items[pos].min = arr[segLeft]
-		// st.items[pos].max = arr[segLeft]
-		st.nodes[pos] = st.initNode(arr[left])
+		st.nodes[pos] = st.initNode(data[left])
 		return
 	}
 
 	mid := left + (right-left)/2
 	leftChild, rightChild := pos*2+1, pos*2+2
-	st.build(arr, leftChild, left, mid)
-	st.build(arr, rightChild, mid+1, right)
-	// st.items[pos].min = min(st.items[leftChild].min, st.items[rightChild].min)
-	// st.items[pos].max = max(st.items[leftChild].max, st.items[rightChild].max)
+	st.build(data, leftChild, left, mid)
+	st.build(data, rightChild, mid+1, right)
 	st.nodes[pos] = st.buildNode(st.nodes[leftChild], st.nodes[rightChild])
 }
 
-func (st *SegmentTree[T]) Query(left, right int) T {
-	return st.item(0, 0, st.size-1, left, right)
+func (st *SegmentTree[T, E]) Query(left, right int) T {
+	return st.query(0, 0, st.size-1, left, right)
 }
 
-func (st *SegmentTree[T]) item(pos int, segLeft, segRight, qLeft, qRight int) T {
+func (st *SegmentTree[T, E]) query(pos int, segLeft, segRight, qLeft, qRight int) T {
 	if segLeft == qLeft && segRight == qRight {
 		return st.nodes[pos]
 	}
 
 	mid := segLeft + (segRight-segLeft)/2
 	if qRight <= mid {
-		return st.item(pos*2+1, segLeft, mid, qLeft, qRight)
+		return st.query(pos*2+1, segLeft, mid, qLeft, qRight)
 	} else if qLeft > mid {
-		return st.item(pos*2+2, mid+1, segRight, qLeft, qRight)
+		return st.query(pos*2+2, mid+1, segRight, qLeft, qRight)
 	} else {
-		resLeft := st.item(pos*2+1, segLeft, mid, qLeft, mid)
-		resRight := st.item(pos*2+2, mid+1, segRight, mid+1, qRight)
-		// return SegTreeItem{
-		// 	min: min(mmLeft.min, mmRight.min),
-		// 	max: max(mmLeft.max, mmRight.max)}
+		resLeft := st.query(pos*2+1, segLeft, mid, qLeft, mid)
+		resRight := st.query(pos*2+2, mid+1, segRight, mid+1, qRight)
 		return st.buildNode(resLeft, resRight)
 	}
 }
 
-func (st *SegmentTree[T]) Update(index int, value int) {
+func (st *SegmentTree[T, E]) Update(index int, value E) {
 	st.update(0, 0, st.size-1, index, value)
 }
 
-func (st *SegmentTree[T]) update(pos int, left, right int, index int, value int) {
+func (st *SegmentTree[T, E]) update(pos int, left, right int, index int, value E) {
 	if left == right {
-		// st.items[pos].min = value
-		// st.items[pos].max = value
 		st.nodes[pos] = st.initNode(value)
 		return
 	}
@@ -84,15 +72,13 @@ func (st *SegmentTree[T]) update(pos int, left, right int, index int, value int)
 	} else {
 		st.update(rightChild, mid+1, right, index, value)
 	}
-	// st.items[pos].min = min(st.items[leftChild].min, st.items[rightChild].min)
-	// st.items[pos].max = max(st.items[leftChild].max, st.items[rightChild].max)
 	st.nodes[pos] = st.buildNode(st.nodes[leftChild], st.nodes[rightChild])
 }
 
-// func (st *SegmentTree[T]) Nums() []int {
-// 	res := make([]int, st.size)
-// 	for i := range res {
-// 		res[i] = st.Query(i, i)
-// 	}
-// 	return res
-// }
+func (st *SegmentTree[T, E]) Items(key func(node T) E) []E {
+	res := make([]E, st.size)
+	for i := range res {
+		res[i] = key(st.Query(i, i))
+	}
+	return res
+}

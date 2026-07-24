@@ -66,7 +66,7 @@ func (t *MMSTTest) Update(index int, value int) {
 
 type STTest struct {
 	nums           []int
-	st             *SegmentTree[MinMax]
+	st             *SegmentTree[MinMax, int]
 	maxNum, minNum int
 }
 
@@ -197,12 +197,7 @@ func testSegmentTree() {
 
 	t := time.Now()
 	test := MakeSTTest(numsLen, minNum, maxNum)
-	nums := make([]int, numsLen)
-	for i := range nums {
-		nums[i] = test.st.Query(i, i).min
-	}
-	// if !slices.Equal(test.nums, test.st.Nums()) {
-	if !slices.Equal(test.nums, nums) {
+	if !slices.Equal(test.nums, test.st.Items(func(node MinMax) int { return node.min })) {
 		fmt.Println("nums and ST are not equal")
 	}
 	for range loopCount {
