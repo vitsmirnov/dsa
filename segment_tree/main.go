@@ -13,7 +13,7 @@ func GenerateNums(size int, minNum, maxNum int) []int {
 	return nums
 }
 
-func sum(arr []int, left, right int) int {
+func Sum(arr []int, left, right int) int {
 	sum := 0
 	for ; left <= right; left++ {
 		sum += arr[left]

@@ -23,7 +23,7 @@ func MakeSSTTest(numsSize int, minNum, maxNum int) *SSTTest {
 }
 
 func (t *SSTTest) TestSum(left, right int) bool {
-	return sum(t.nums, left, right) == t.st.Sum(left, right)
+	return Sum(t.nums, left, right) == t.st.Sum(left, right)
 }
 
 func (t *SSTTest) Update(index int, value int) {

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"math/rand/v2"
 	"slices"
 	"time"
@@ -9,36 +10,51 @@ import (
 
 type STTest struct {
 	nums           []int
-	st             *SegmentTree[MinMax, int]
+	stree          *SegmentTree[MinMaxSum, int]
 	maxNum, minNum int
+}
+
+type MinMaxSum struct {
+	min, max int
+	sum      int
 }
 
 func MakeSTTest(numsSize int, minNum, maxNum int) *STTest {
 	nums := GenerateNums(numsSize, minNum, maxNum)
-	initNode := func(val int) MinMax {
-		return MinMax{min: val, max: val}
+	initNode := func(val int) MinMaxSum {
+		return MinMaxSum{min: val, max: val, sum: val}
 	}
-	buildNode := func(leftChild, rightChild MinMax) MinMax {
-		return MinMax{
+	buildNode := func(leftChild, rightChild MinMaxSum) MinMaxSum {
+		return MinMaxSum{
 			min: min(leftChild.min, rightChild.min),
-			max: max(leftChild.max, rightChild.max)}
+			max: max(leftChild.max, rightChild.max),
+			sum: leftChild.sum + rightChild.sum}
 	}
 	return &STTest{
 		nums:   nums,
-		st:     MakeSegmentTree(nums, initNode, buildNode),
+		stree:  MakeSegmentTree(nums, initNode, buildNode),
 		maxNum: maxNum,
 		minNum: minNum}
 }
 
 func (t *STTest) TestQuery(left, right int) bool {
-	node := t.st.Query(left, right)
-	return MinRange(t.nums, left, right) == node.min &&
-		MaxRange(t.nums, left, right) == node.max
+	node := t.stree.Query(left, right)
+	minNum, maxNum := math.MaxInt, math.MinInt
+	sum := 0
+	for _, num := range t.nums[left : right+1] {
+		minNum = min(minNum, num)
+		maxNum = max(maxNum, num)
+		sum += num
+	}
+	return minNum == node.min && maxNum == node.max && sum == node.sum
+	// return MinRange(t.nums, left, right) == node.min &&
+	// 	MaxRange(t.nums, left, right) == node.max &&
+	// 	Sum(t.nums, left, right) == node.sum
 }
 
 func (t *STTest) Update(index int, value int) {
 	t.nums[index] = value
-	t.st.Update(index, value)
+	t.stree.Update(index, value)
 }
 
 // todo: cleanup
@@ -51,7 +67,7 @@ func testSegmentTree() {
 
 	t := time.Now()
 	test := MakeSTTest(numsLen, minNum, maxNum)
-	if !slices.Equal(test.nums, test.st.Items(func(node MinMax) int { return node.min })) {
+	if !slices.Equal(test.nums, test.stree.Items(func(node MinMaxSum) int { return node.sum })) {
 		fmt.Println("nums and ST are not equal")
 	}
 	for range loopCount {
